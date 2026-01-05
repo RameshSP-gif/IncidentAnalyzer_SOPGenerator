@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOP Generator - Incident Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="header-title">
+                    <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Incident Analyzer & SOP Generator
+                </h1>
+                <p class="header-subtitle">AI-Powered Standard Operating Procedure Creation</p>
+                <div style="margin-top: 15px;">
+                    <a href="/manage" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 8px; color: white; text-decoration: none; font-weight: 500; transition: all 0.3s;">
+                        <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        Manage Knowledge Base
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-button active" onclick="showTab('single')">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Single Incident
+                </button>
+                <button class="tab-button" onclick="showTab('batch')">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    Batch Analysis
+                </button>
+            </div>
+
+            <!-- Single Incident Tab -->
+            <div id="single-tab" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Incident Details</h2>
+                        <p class="card-description">Enter incident information to generate an SOP</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="single-incident-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="incident_number">Incident Number</label>
+                                    <input type="text" id="incident_number" name="incident_number" placeholder="INC0001" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="category">Category *</label>
+                                    <select id="category" name="category" class="form-select" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Email">Email</option>
+                                        <option value="Network">Network</option>
+                                        <option value="Hardware">Hardware</option>
+                                        <option value="Software">Software</option>
+                                        <option value="Database">Database</option>
+                                        <option value="Access">Access/Security</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="priority">Priority</label>
+                                    <select id="priority" name="priority" class="form-select">
+                                        <option value="1">1 - Critical</option>
+                                        <option value="2">2 - High</option>
+                                        <option value="3" selected>3 - Medium</option>
+                                        <option value="4">4 - Low</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="short_description">Short Description *</label>
+                                <input type="text" id="short_description" name="short_description" placeholder="Brief summary of the issue" class="form-input" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">Detailed Description *</label>
+                                <textarea id="description" name="description" rows="4" placeholder="Detailed description of the problem, symptoms, and user impact..." class="form-textarea" required></textarea>
+                                <div class="form-hint">Minimum 20 characters</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="resolution_notes">
+                                    Resolution Notes
+                                    <span style="color: var(--text-secondary); font-weight: normal;">(or click AI Suggest below)</span>
+                                </label>
+                                <textarea id="resolution_notes" name="resolution_notes" rows="5" placeholder="Step-by-step resolution details, actions taken, and final outcome... OR click 'AI Suggest Resolution' button below" class="form-textarea"></textarea>
+                                <div class="form-hint">
+                                    <button type="button" onclick="suggestResolution()" class="btn btn-secondary" style="margin-top: 10px; padding: 8px 16px; font-size: 0.85rem;">
+                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                        </svg>
+                                        🤖 AI Suggest Resolution from Past Incidents
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    Generate SOP
+                                </button>
+                                <button type="reset" class="btn btn-secondary">Clear Form</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Single SOP Result -->
+                <div id="single-sop-result" class="sop-result" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Generated SOP</h2>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="downloadSOPAsPDF('single')" class="btn btn-secondary" title="Download as PDF">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 18px; height: 18px; margin-right: 5px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Download PDF
+                                </button>
+                                <button onclick="copySOP('single')" class="btn btn-icon-only" title="Copy to clipboard">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="single-sop-content" class="sop-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Batch Analysis Tab -->
+            <div id="batch-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Batch Incident Analysis</h2>
+                        <p class="card-description">Add multiple incidents for ML-powered categorization and SOP generation</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Incidents</div>
+                                <div class="stat-value" id="total-incidents">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Ready for Analysis</div>
+                                <div class="stat-value" id="ready-incidents">0</div>
+                            </div>
+                        </div>
+
+                        <form id="batch-incident-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="batch_short_description">Short Description *</label>
+                                    <input type="text" id="batch_short_description" name="short_description" placeholder="Brief summary" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="batch_category">Category *</label>
+                                    <select id="batch_category" name="category" class="form-select" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Email">Email</option>
+                                        <option value="Network">Network</option>
+                                        <option value="Hardware">Hardware</option>
+                                        <option value="Software">Software</option>
+                                        <option value="Database">Database</option>
+                                        <option value="Access">Access/Security</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="batch_description">Detailed Description *</label>
+                                <textarea id="batch_description" name="description" rows="3" placeholder="Detailed problem description..." class="form-textarea" required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="batch_resolution_notes">Resolution Notes *</label>
+                                <textarea id="batch_resolution_notes" name="resolution_notes" rows="3" placeholder="Resolution details..." class="form-textarea" required></textarea>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-secondary">
+                                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                    Add Incident
+                                </button>
+                                <button type="button" onclick="generateBatchSOPs()" class="btn btn-primary" id="generate-batch-btn" disabled>
+                                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    Generate SOPs
+                                </button>
+                                <button type="button" onclick="clearAllIncidents()" class="btn btn-secondary">Clear All</button>
+                            </div>
+                        </form>
+
+                        <!-- Incidents List -->
+                        <div id="incidents-list" class="incidents-list"></div>
+                    </div>
+                </div>
+
+                <!-- Batch SOP Results -->
+                <div id="batch-sop-results" class="sop-result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 Incident Analyzer & SOP Generator | AI-Powered Documentation</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Processing...</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

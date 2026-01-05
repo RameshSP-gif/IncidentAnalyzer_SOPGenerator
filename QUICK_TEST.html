@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Test - SOP Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2563eb;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+        }
+        .field {
+            margin: 15px 0;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .field-value {
+            background: #f8f9fa;
+            padding: 10px;
+            border-left: 3px solid #2563eb;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        .button {
+            background: #2563eb;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        .button:hover {
+            background: #1e40af;
+        }
+        .info {
+            background: #e0f2fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 4px solid #0ea5e9;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Quick Test - Sample Data</h1>
+    
+    <div class="info">
+        <strong>Instructions:</strong> Copy and paste each field value into the web application at <a href="http://127.0.0.1:5000" target="_blank">http://127.0.0.1:5000</a>
+    </div>
+
+    <div class="test-card">
+        <h2>✅ Test Case 1: Email Access Issue</h2>
+        
+        <div class="field">
+            <span class="field-label">Incident Number:</span>
+            <div class="field-value">INC0001</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Category:</span>
+            <div class="field-value">Email</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Priority:</span>
+            <div class="field-value">3 - Medium</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Short Description:</span>
+            <div class="field-value">User unable to access email account</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Detailed Description:</span>
+            <div class="field-value">User reports that they cannot log into their email account. Error message "Invalid credentials" appears when attempting to sign in. User has tried resetting password but still cannot access. This issue started this morning after system maintenance.</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Resolution Notes:</span>
+            <div class="field-value">Verified user account was locked due to multiple failed login attempts. Unlocked the account in Active Directory. Reset password following company policy. Tested login - successful. Advised user to clear browser cache and cookies. Confirmed user can now access email normally. Issue resolved.</div>
+        </div>
+
+        <button class="button" onclick="window.open('http://127.0.0.1:5000', '_blank')">Open Application →</button>
+    </div>
+
+    <div class="test-card">
+        <h2>✅ Test Case 2: Network Connectivity Issue</h2>
+        
+        <div class="field">
+            <span class="field-label">Incident Number:</span>
+            <div class="field-value">INC0002</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Category:</span>
+            <div class="field-value">Network</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Priority:</span>
+            <div class="field-value">2 - High</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Short Description:</span>
+            <div class="field-value">Intermittent network connectivity drops</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Detailed Description:</span>
+            <div class="field-value">User experiencing frequent disconnections from corporate network. Connection drops every 15-20 minutes requiring manual reconnection. Affecting productivity and ongoing video conferences. Problem occurs on both wired and wireless connections.</div>
+        </div>
+
+        <div class="field">
+            <span class="field-label">Resolution Notes:</span>
+            <div class="field-value">Diagnosed network adapter driver issue. Updated network adapter driver to latest version from manufacturer website. Disabled power management settings that were causing adapter to sleep. Monitored connection for 2 hours - no disconnections observed. Tested with video conference - stable connection maintained. User confirmed issue resolved.</div>
+        </div>
+
+        <button class="button" onclick="window.open('http://127.0.0.1:5000', '_blank')">Open Application →</button>
+    </div>
+
+    <div class="test-card">
+        <h2>📊 Expected Result</h2>
+        <p style="line-height: 1.8;">
+            After clicking "Generate SOP", you should see:<br>
+            ✅ A professionally formatted SOP document<br>
+            ✅ SOP Information section with incident details<br>
+            ✅ Problem Statement extracted from description<br>
+            ✅ Symptoms section<br>
+            ✅ Resolution Steps from your notes<br>
+            ✅ Related Incidents list<br>
+            ✅ Success toast notification (bottom right)<br>
+        </p>
+    </div>
+
+    <script>
+        // Add copy functionality
+        document.querySelectorAll('.field-value').forEach(el => {
+            el.style.cursor = 'pointer';
+            el.title = 'Click to copy';
+            el.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent);
+                const original = this.style.background;
+                this.style.background = '#d1fae5';
+                setTimeout(() => {
+                    this.style.background = original;
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+# Application Configuration
+
+servicenow:
+  # Fields to fetch from ServiceNow incidents
+  fields:
+    - number
+    - short_description
+    - description
+    - priority
+    - category
+    - subcategory
+    - assignment_group
+    - assigned_to
+    - state
+    - resolution_notes
+    - close_notes
+    - work_notes
+    - sys_created_on
+    - sys_updated_on
+    - resolved_at
+    - closed_at
+  
+  # Query filters
+  query:
+    state: closed
+    min_priority: 3
+    days_back: 90
+
+data_validation:
+  # Required fields for valid incident
+  required_fields:
+    - number
+    - short_description
+    - resolution_notes
+    - category
+  
+  # Minimum content length
+  min_description_length: 20
+  min_resolution_length: 30
+  
+  # Data quality checks
+  checks:
+    - missing_data
+    - duplicate_detection
+    - inconsistent_categorization
+    - insufficient_detail
+
+categorization:
+  # ML model settings
+  embedding_model: all-MiniLM-L6-v2
+  clustering_algorithm: hdbscan
+  min_cluster_size: 5
+  min_samples: 3
+  
+  # Similarity threshold for grouping
+  similarity_threshold: 0.75
+  
+  # Feature extraction
+  features:
+    - description
+    - resolution_notes
+    - category
+    - symptoms
+
+sop_generation:
+  # Template settings
+  template_format: markdown
+  include_sections:
+    - overview
+    - problem_statement
+    - symptoms
+    - prerequisites
+    - resolution_steps
+    - verification
+    - related_incidents
+    - metadata
+  
+  # Quality requirements
+  min_incidents_for_sop: 3
+  max_incidents_in_cluster: 100
+  
+  # Output settings
+  output_format: markdown
+  include_diagrams: false
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: logs/app.log

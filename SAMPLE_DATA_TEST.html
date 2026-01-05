@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Test Data - SOP Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .test-card:hover {
+            transform: translateY(-5px);
+        }
+        .test-card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+        }
+        .field-group {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid #667eea;
+        }
+        .field-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .field-value {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: #212529;
+            cursor: pointer;
+            position: relative;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .field-value:hover {
+            background: #e7f3ff;
+            border-color: #667eea;
+        }
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .copy-btn:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+        .note strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        .instructions {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .instructions h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        .instructions ol {
+            margin-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Sample Test Data - SOP Generator</h1>
+        
+        <div class="instructions">
+            <h2>📋 How to Test</h2>
+            <ol>
+                <li>Click on any field value below to <strong>automatically copy</strong> it to clipboard</li>
+                <li>Open the SOP Generator at <a href="http://127.0.0.1:5000" target="_blank">http://127.0.0.1:5000</a></li>
+                <li>Paste each field value into the corresponding form field</li>
+                <li><strong>Optional:</strong> Use "🤖 AI Suggest Resolution" button OR paste the resolution manually</li>
+                <li>Click <strong>"Generate SOP"</strong> button</li>
+                <li>Verify the SOP displays below the form with professional styling</li>
+            </ol>
+        </div>
+
+        <div class="note">
+            <strong>💡 Pro Tip:</strong>
+            Click the field values below to copy them instantly! You can also use the "Copy All" button to get all field values at once.
+        </div>
+
+        <!-- Test Case 1: Email Issue -->
+        <div class="test-card">
+            <h2>Test Case 1: Email Access Issue <span class="badge">Most Common</span></h2>
+            
+            <div class="field-group">
+                <div class="field-label">Incident Number:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">INC0001234</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Category:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Email</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Priority:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">2-Medium</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Short Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">User unable to access email account after password reset</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">User reports that they cannot log into their email account following a recent password reset. Error message "Invalid credentials" appears when attempting to sign in. User has tried resetting password multiple times but still cannot access. This issue started this morning after system maintenance window. User is unable to perform daily work tasks that require email access.</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Resolution (Optional - Can use AI Suggest):</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Verified user account was locked in Active Directory due to multiple failed login attempts during password reset process. Unlocked the account using AD Users and Computers console. Reset password following company security policy requirements. Cleared cached credentials on user's workstation. Tested login - successful. Advised user to clear browser cache and cookies for web mail access. Configured Outlook profile with new credentials. Confirmed user can now access email normally via both Outlook and web interface. Issue resolved.</div>
+            </div>
+
+            <button class="copy-btn" onclick="copyAllFields(1)">📋 Copy All Fields</button>
+        </div>
+
+        <!-- Test Case 2: Network Issue -->
+        <div class="test-card">
+            <h2>Test Case 2: Network Connectivity Issue <span class="badge">High Priority</span></h2>
+            
+            <div class="field-group">
+                <div class="field-label">Incident Number:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">INC0005678</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Category:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Network</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Priority:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">1-High</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Short Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Entire department experiencing intermittent network disconnections</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Multiple users in the Finance department (3rd floor, West wing) are reporting intermittent network connectivity issues. Users are experiencing frequent disconnections lasting 30-60 seconds every 10-15 minutes. This is affecting approximately 25 users. Issue impacts access to shared drives, enterprise applications, and internet connectivity. Problem started around 9:00 AM today. Users report they can ping the gateway but experience packet loss. Business operations are severely impacted.</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Resolution (Optional - Can use AI Suggest):</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Investigated network switch serving 3rd floor West wing. Identified switch port flapping on uplink connection (port 48). Reviewed switch logs showing CRC errors and input errors indicating physical layer issue. Located and replaced faulty fiber optic cable connecting IDF to MDF. Tested cable integrity using OTDR - confirmed clean signal. Monitored network performance for 30 minutes - no packet loss detected. Verified all 25 affected users can access network resources without interruption. Updated network documentation with new cable installation details. Issue resolved.</div>
+            </div>
+
+            <button class="copy-btn" onclick="copyAllFields(2)">📋 Copy All Fields</button>
+        </div>
+
+        <!-- Test Case 3: Application Issue -->
+        <div class="test-card">
+            <h2>Test Case 3: Application Performance Issue</h2>
+            
+            <div class="field-group">
+                <div class="field-label">Incident Number:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">INC0009876</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Category:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Application</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Priority:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">3-Low</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Short Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">CRM application loading slowly for sales team</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Sales team members report that the CRM application is taking 2-3 minutes to load customer records, which normally takes 5-10 seconds. Issue affects approximately 15 users in the Sales department. Problem started yesterday afternoon around 3 PM. Users can eventually access records but experience significant delays. No error messages displayed. Application becomes responsive once data loads. Performance degradation is consistent across all sales team members.</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Resolution (Optional - Can use AI Suggest):</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Investigated CRM application server performance metrics. Identified database query running slowly due to missing index on customer_records table. Analyzed SQL execution plans showing full table scans on 2.5M record table. Created composite index on frequently queried columns (customer_id, last_modified_date). Rebuilt statistics on affected tables. Tested query performance - load time reduced from 180 seconds to 3 seconds. Verified with 5 sales team members - confirmed normal performance restored. Scheduled database maintenance window to optimize remaining indexes. Issue resolved.</div>
+            </div>
+
+            <button class="copy-btn" onclick="copyAllFields(3)">📋 Copy All Fields</button>
+        </div>
+
+        <!-- Test Case 4: Hardware Issue -->
+        <div class="test-card">
+            <h2>Test Case 4: Hardware Failure <span class="badge">Critical</span></h2>
+            
+            <div class="field-group">
+                <div class="field-label">Incident Number:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">INC0002468</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Category:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Hardware</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Priority:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">1-Critical</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Short Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Laptop won't power on after Windows update</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Executive assistant reports their Dell Latitude laptop will not power on. Laptop was working fine yesterday. User shut down laptop last night after installing Windows updates. This morning, pressing power button shows no response - no LED lights, no fan noise, no display activity. User tried holding power button for 30 seconds. Laptop was fully charged yesterday. User needs laptop urgently for board meeting presentations this afternoon. Asset tag: LT-4532.</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Resolution (Optional - Leave Empty to Test AI Suggestion):</div>
+                <div class="field-value" onclick="copyToClipboard(this)"></div>
+                <div style="margin-top: 10px; padding: 10px; background: #e7f3ff; border-radius: 6px; font-size: 0.9rem;">
+                    <strong>💡 Test Tip:</strong> Leave this field empty and use the "🤖 AI Suggest Resolution" button to see the RAG system find a similar resolution from the knowledge base!
+                </div>
+            </div>
+
+            <button class="copy-btn" onclick="copyAllFields(4)">📋 Copy All Fields (No Resolution)</button>
+        </div>
+
+        <!-- Test Case 5: Access Request -->
+        <div class="test-card">
+            <h2>Test Case 5: Access Rights Issue</h2>
+            
+            <div class="field-group">
+                <div class="field-label">Incident Number:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">INC0007531</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Category:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Access</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Priority:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">2-Medium</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Short Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">New employee cannot access shared departmental folder</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Description:</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Newly hired marketing coordinator (started Monday) reports inability to access the Marketing shared folder on network drive M:\. User can see the drive but receives "Access Denied" error when attempting to open folder. Manager confirms employee should have read/write access to marketing materials. User needs access to templates and brand guidelines to begin onboarding tasks. Other network resources appear to be working correctly. User ID: mcoord01.</div>
+            </div>
+
+            <div class="field-group">
+                <div class="field-label">Resolution (Optional - Can use AI Suggest):</div>
+                <div class="field-value" onclick="copyToClipboard(this)">Verified user account mcoord01 exists in Active Directory but was not added to Marketing-Users security group. Confirmed with manager that user requires standard marketing team access level. Added user to Marketing-Users security group in AD. Verified group membership propagation. Had user log off and log back in to refresh Kerberos token. Tested access to M:\Marketing folder - user can now read and write files. Granted access to shared OneNote notebooks and Teams channels per manager request. Sent welcome email with links to key resources. Issue resolved.</div>
+            </div>
+
+            <button class="copy-btn" onclick="copyAllFields(5)">📋 Copy All Fields</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        function copyToClipboard(element) {
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard! ✓');
+            }).catch(err => {
+                showToast('Failed to copy', true);
+                console.error('Copy failed:', err);
+            });
+        }
+
+        function copyAllFields(testCase) {
+            let allText = '';
+            const card = event.target.closest('.test-card');
+            const fields = card.querySelectorAll('.field-value');
+            
+            fields.forEach((field, index) => {
+                const label = field.previousElementSibling.textContent.replace(':', '');
+                const value = field.textContent.trim();
+                if (value) {
+                    allText += `${label}\n${value}\n\n`;
+                }
+            });
+
+            navigator.clipboard.writeText(allText).then(() => {
+                showToast(`All fields from Test Case ${testCase} copied! ✓`);
+            }).catch(err => {
+                showToast('Failed to copy', true);
+                console.error('Copy failed:', err);
+            });
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.background = isError ? '#dc3545' : '#28a745';
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

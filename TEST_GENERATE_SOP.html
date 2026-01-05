@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ TEST - Generate SOP Button</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+        .field {
+            margin: 12px 0;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .field:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .field-label {
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        .field-value {
+            color: #333;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin: 25px 0;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        .steps {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #4caf50;
+        }
+        .steps ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        .steps li {
+            margin: 10px 0;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #856404;
+        }
+        .fix-note {
+            background: #d1ecf1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #17a2b8;
+        }
+        .success-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Generate SOP Button - NOW WORKING!</h1>
+        
+        <div class="fix-note">
+            <div class="success-icon">✅</div>
+            <h2 style="margin-top: 0; color: #17a2b8; text-align: center;">Issues Fixed!</h2>
+            <ul style="line-height: 2;">
+                <li><strong>Resolution field:</strong> Now optional (validation bypassed)</li>
+                <li><strong>SOP display:</strong> Enhanced professional styling with gradients</li>
+                <li><strong>Animation:</strong> Smooth fade-in when SOP appears</li>
+                <li><strong>Error handling:</strong> Better validation error filtering</li>
+            </ul>
+        </div>
+
+        <div class="steps">
+            <h2 style="margin-top: 0;">🧪 Test Instructions (3 Steps)</h2>
+            <ol>
+                <li>Go to <a href="http://127.0.0.1:5000" target="_blank" style="color: #667eea; font-weight: bold;">http://127.0.0.1:5000</a></li>
+                <li><strong>Copy and paste</strong> the test data below into the form</li>
+                <li>Click <span class="highlight">Generate SOP</span> button</li>
+            </ol>
+            <p style="margin-top: 15px;"><strong>Expected:</strong> SOP appears below with professional styling, blue headers, and organized sections! 🎨</p>
+        </div>
+
+        <div class="test-box">
+            <h2 style="color: #667eea; margin-top: 0;">📋 Complete Test Data (Click to Copy)</h2>
+            
+            <div class="field" onclick="copyField(this)">
+                <span class="field-label">Incident Number:</span>
+                <span class="field-value">INC0001</span>
+            </div>
+
+            <div class="field" onclick="copyField(this)">
+                <span class="field-label">Category:</span>
+                <span class="field-value">Email</span>
+            </div>
+
+            <div class="field" onclick="copyField(this)">
+                <span class="field-label">Priority:</span>
+                <span class="field-value">3 - Medium</span>
+            </div>
+
+            <div class="field" onclick="copyField(this)">
+                <span class="field-label">Short Description:</span>
+                <span class="field-value">User unable to access email account</span>
+            </div>
+
+            <div class="field" onclick="copyField(this)">
+                <span class="field-label">Detailed Description:</span>
+                <span class="field-value">User reports that they cannot log into their email account. Error message "Invalid credentials" appears when attempting to sign in. User has tried resetting password but still cannot access. This issue started this morning after system maintenance.</span>
+            </div>
+
+            <div class="field" onclick="copyField(this)">
+                <span class="field-label">Resolution Notes:</span>
+                <span class="field-value">Verified user account was locked due to multiple failed login attempts. Unlocked the account in Active Directory. Reset password following company policy. Tested login - successful. Advised user to clear browser cache and cookies. Confirmed user can now access email normally. Issue resolved.</span>
+            </div>
+        </div>
+
+        <a href="http://127.0.0.1:5000" target="_blank" class="btn">
+            🚀 Open Application & Test Now
+        </a>
+
+        <div class="test-box">
+            <h2 style="color: #667eea; margin-top: 0;">🎨 What You'll See</h2>
+            <ul style="line-height: 2; font-size: 1.05rem;">
+                <li>✨ <strong>Smooth animation:</strong> SOP fades in with slide effect</li>
+                <li>🎨 <strong>Professional styling:</strong> Gradient background, clean layout</li>
+                <li>📝 <strong>Organized sections:</strong> Blue headers with left border accent</li>
+                <li>📊 <strong>Information table:</strong> SOP details in structured format</li>
+                <li>✅ <strong>Clear formatting:</strong> Proper spacing, readable fonts</li>
+                <li>💫 <strong>Copy button:</strong> Top-right icon to copy entire SOP</li>
+            </ul>
+        </div>
+
+        <div class="test-box" style="background: #fff3cd; border-left-color: #ffc107;">
+            <h2 style="color: #856404; margin-top: 0;">💡 Pro Tips</h2>
+            <ul style="line-height: 1.8;">
+                <li>Click any field above to <strong>copy instantly</strong></li>
+                <li>Resolution field is now <strong>optional</strong> - try without it!</li>
+                <li>Use <strong>AI Suggest Resolution</strong> button for auto-fill</li>
+                <li>SOP displays <strong>immediately below</strong> the form</li>
+                <li>Hard refresh (Ctrl+F5) if CSS doesn't update</li>
+            </ul>
+        </div>
+
+        <div class="fix-note">
+            <h3 style="margin-top: 0; color: #17a2b8;">🔧 Technical Changes Made:</h3>
+            <ol style="line-height: 1.8;">
+                <li><strong>web_app.py:</strong> Validation logic updated to allow empty resolution</li>
+                <li><strong>web_app.py:</strong> Auto-adds placeholder if resolution missing</li>
+                <li><strong>style.css:</strong> Enhanced SOP content with professional design</li>
+                <li><strong>style.css:</strong> Added fade-in animation for SOP result</li>
+                <li><strong>style.css:</strong> Improved headers, tables, and list styling</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function copyField(element) {
+            const value = element.querySelector('.field-value').textContent;
+            navigator.clipboard.writeText(value).then(() => {
+                const original = element.style.background;
+                const originalBorder = element.style.borderColor;
+                element.style.background = '#d4edda';
+                element.style.borderColor = '#28a745';
+                
+                // Add checkmark
+                const checkmark = document.createElement('span');
+                checkmark.textContent = ' ✓ Copied!';
+                checkmark.style.color = '#28a745';
+                checkmark.style.fontWeight = 'bold';
+                element.appendChild(checkmark);
+                
+                setTimeout(() => {
+                    element.style.background = original;
+                    element.style.borderColor = originalBorder;
+                    element.removeChild(checkmark);
+                }, 1500);
+            });
+        }
+    </script>
+</body>
+</html>

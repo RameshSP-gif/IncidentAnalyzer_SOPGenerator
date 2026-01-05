@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 RAG Demo - AI Resolution Finder</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #667eea;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        .feature-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        .test-case {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #667eea;
+        }
+        .test-case h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        .field {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .field:hover {
+            background: #e3f2fd;
+            transform: translateX(5px);
+        }
+        .field-label {
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin: 20px 0;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+        .steps {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #ffc107;
+        }
+        .steps ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        .steps li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        .highlight {
+            background: #ffc107;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .kb-list {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .kb-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 RAG Resolution Finder</h1>
+        <div class="subtitle">AI-Powered Resolution Suggestions from Past Incidents</div>
+
+        <div class="feature-box">
+            <h2 style="margin-top: 0;">✨ What's New?</h2>
+            <p style="font-size: 1.1rem; line-height: 1.8;">
+                Your SOP Generator now has <strong>AI-powered resolution suggestions</strong>!<br>
+                No need to manually type resolutions - the AI finds similar past incidents and suggests proven solutions automatically.
+            </p>
+        </div>
+
+        <div class="steps">
+            <h2 style="margin-top: 0;">📋 How to Use (4 Easy Steps)</h2>
+            <ol>
+                <li>Go to <a href="http://127.0.0.1:5000" target="_blank">http://127.0.0.1:5000</a></li>
+                <li>Fill in <strong>Problem Description</strong> (short & detailed) and <strong>Category</strong></li>
+                <li>Click the <span class="highlight">🤖 AI Suggest Resolution</span> button</li>
+                <li>AI auto-fills the Resolution field with best matching solution!</li>
+            </ol>
+        </div>
+
+        <h2>🧪 Ready-to-Test Examples</h2>
+
+        <div class="test-case">
+            <h3>✅ Test Case 1: Email Login Problem</h3>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Short Description:</span>
+                Cannot login to email account
+            </div>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Detailed Description:</span>
+                User getting authentication error when trying to access email. Tried password reset but still cannot login. Error says invalid credentials.
+            </div>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Category:</span>
+                Email
+            </div>
+            <p style="margin-top: 15px;"><strong>Expected AI Result:</strong> ✅ Matches <code>INC0001</code> - Account unlock procedure (~87% confidence)</p>
+        </div>
+
+        <div class="test-case">
+            <h3>✅ Test Case 2: Network Slowness</h3>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Short Description:</span>
+                Very slow network file transfers
+            </div>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Detailed Description:</span>
+                Copying files to network drive takes forever. 100MB file taking 20 minutes. Internet speed is fine. Only this computer affected.
+            </div>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Category:</span>
+                Network
+            </div>
+            <p style="margin-top: 15px;"><strong>Expected AI Result:</strong> ✅ Matches <code>INC0005</code> - Network cable replacement (~80% confidence)</p>
+        </div>
+
+        <div class="test-case">
+            <h3>✅ Test Case 3: Printer Issue</h3>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Short Description:</span>
+                Printer not printing any documents
+            </div>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Detailed Description:</span>
+                All print jobs stuck in queue. Printer shows online and ready. Multiple users cannot print. Jobs just stay in queue.
+            </div>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Category:</span>
+                Hardware
+            </div>
+            <p style="margin-top: 15px;"><strong>Expected AI Result:</strong> ✅ Matches <code>INC0009</code> - Print spooler restart procedure (~85% confidence)</p>
+        </div>
+
+        <div class="test-case">
+            <h3>❌ Test Case 4: Unknown Issue (No Match)</h3>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Short Description:</span>
+                Keyboard backlight not working
+            </div>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Detailed Description:</span>
+                Laptop keyboard backlight stopped functioning. Function keys not responding. Rest of keyboard works fine.
+            </div>
+            <div class="field" onclick="copyText(this)">
+                <span class="field-label">Category:</span>
+                Hardware
+            </div>
+            <p style="margin-top: 15px;"><strong>Expected AI Result:</strong> ❌ "No similar incidents found. Please enter resolution manually."</p>
+        </div>
+
+        <a href="http://127.0.0.1:5000" target="_blank" class="btn">
+            🚀 Open SOP Generator Application
+        </a>
+
+        <div class="kb-list">
+            <h2>📚 Pre-Loaded Knowledge Base (10 Incidents)</h2>
+            <p>The AI can suggest resolutions for these types of issues:</p>
+            <div class="kb-item">📧 <strong>Email</strong>: Account locks, attachment limits, mobile sync (3 incidents)</div>
+            <div class="kb-item">🌐 <strong>Network</strong>: Connectivity drops, slow speeds, VPN issues (3 incidents)</div>
+            <div class="kb-item">🔐 <strong>Access</strong>: Password resets, folder permissions (2 incidents)</div>
+            <div class="kb-item">🖥️ <strong>Hardware</strong>: Printer problems, slow computers (2 incidents)</div>
+        </div>
+
+        <div class="steps">
+            <h2 style="margin-top: 0;">💡 Pro Tips</h2>
+            <ul style="line-height: 1.8;">
+                <li><strong>Click any field above</strong> to copy it to clipboard instantly</li>
+                <li>Be <strong>specific in descriptions</strong> for better AI matches</li>
+                <li>Check the <strong>confidence score</strong> (shows match quality)</li>
+                <li>You can <strong>edit AI suggestions</strong> before generating SOP</li>
+                <li><strong>Resolution field is now optional</strong> - let AI fill it!</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <h3 style="color: #667eea;">🎯 How RAG Works</h3>
+            <p style="font-size: 1.1rem; line-height: 1.8;">
+                <strong>Problem Description</strong> → 
+                <strong>AI Embeddings</strong> → 
+                <strong>Semantic Search</strong> → 
+                <strong>Find Similar Past Incidents</strong> → 
+                <strong>Extract Best Resolution</strong> → 
+                <strong>Auto-Fill Form</strong>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function copyText(element) {
+            const text = element.textContent.split(':')[1].trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const original = element.style.background;
+                element.style.background = '#d4edda';
+                element.innerHTML = element.innerHTML + ' <span style="color: #28a745;">✓ Copied!</span>';
+                setTimeout(() => {
+                    element.style.background = original;
+                    element.innerHTML = element.innerHTML.replace(' <span style="color: #28a745;">✓ Copied!</span>', '');
+                }, 1000);
+            });
+        }
+
+        // Auto-show toast
+        window.addEventListener('load', () => {
+            if (window.location.search.includes('demo=true')) {
+                alert('🎉 RAG Resolution Finder is now active!\n\nTry clicking "AI Suggest Resolution" after entering a problem description.');
+            }
+        });
+    </script>
+</body>
+</html>
