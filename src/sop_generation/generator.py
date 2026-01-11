@@ -117,118 +117,110 @@ class SOPGenerator:
         }
     
     def _extract_resolution_steps(self, resolutions: List[Dict]) -> List[str]:
-        """Extract common resolution steps from resolutions"""
-        # Simple extraction - look for numbered lists, bullet points, etc.
+        """Extract resolution steps from resolutions - handles both structured and unstructured text"""
         all_steps = []
         
         for res_data in resolutions:
             resolution = res_data["resolution"]
             
-            # Split by common delimiters
+            # Skip placeholder or empty resolutions
+            if not resolution or 'pending' in resolution.lower() or 'manually' in resolution.lower():
+                continue
+            
+            # Split by common delimiters to find sentences
             lines = resolution.split('\n')
             
             for line in lines:
                 line = line.strip()
+                if not line:
+                    continue
                 
-                # Look for step indicators
-                if any(line.startswith(prefix) for prefix in ['1.', '2.', '3.', '-', '*', '•']):
+                # Check for already numbered/bulleted steps
+                if any(line.startswith(prefix) for prefix in ['1.', '2.', '3.', '4.', '5.', '-', '*', '•']):
                     # Clean up the step
                     step = line.lstrip('0123456789.-*•) \t')
                     if len(step) > 10:  # Meaningful step
                         all_steps.append(step)
+                # Handle plain sentences - split by period if multiple sentences
+                elif '.' in line:
+                    sentences = [s.strip() for s in line.split('.') if len(s.strip()) > 10]
+                    all_steps.extend(sentences)
+                # Handle sentences separated by 'and'
+                elif ' and ' in line:
+                    parts = [p.strip() for p in line.split(' and ') if len(p.strip()) > 10]
+                    all_steps.extend(parts)
+                # Single meaningful sentence
+                elif len(line) > 10:
+                    all_steps.append(line)
         
-        # Get most common steps (simple frequency-based)
+        # Remove duplicates while preserving order and frequency
+        seen = set()
+        unique_steps = []
         step_freq = {}
+        
         for step in all_steps:
-            # Normalize for comparison
-            normalized = step.lower()[:50]  # First 50 chars
-            step_freq[step] = step_freq.get(step, 0) + 1
+            # Normalize for comparison (case-insensitive, first 60 chars)
+            normalized = step.lower()[:60]
+            
+            # Track frequency
+            if normalized not in step_freq:
+                step_freq[normalized] = []
+            step_freq[normalized].append(step)
         
-        # Return top steps
-        sorted_steps = sorted(
-            step_freq.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )
+        # Get the best version of each unique step and sort by frequency
+        step_list = []
+        for normalized, variants in step_freq.items():
+            # Use the longest variant (most detailed)
+            best_step = max(variants, key=len)
+            step_list.append((best_step, len(variants)))
         
-        return [step for step, _ in sorted_steps[:10]]
+        # Sort by frequency (descending) and return top steps
+        sorted_steps = sorted(step_list, key=lambda x: x[1], reverse=True)
+        return [step for step, _ in sorted_steps[:15]]  # Return top 15 steps
     
     def _generate_markdown_sop(self, cluster_id: int, data: Dict) -> str:
-        """Generate SOP in Markdown format"""
+        """Generate SOP in Markdown format - concise and action-oriented"""
         
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        sop = f"""# Standard Operating Procedure
+        sop = f"""# SOP-{cluster_id:04d}: {data['category']} Resolution
 
-## SOP Information
-- **SOP ID**: SOP-{cluster_id:04d}
-- **Category**: {data['category']}
-- **Based on**: {data['incident_count']} incidents
-- **Generated**: {timestamp}
-- **Average Resolution Time**: {data['avg_resolution_time']:.1f} hours
+**Category**: {data['category']} | **Created**: {timestamp}
 
 ---
 
-## Overview
-
-This SOP provides step-by-step instructions for resolving incidents related to **{data['category']}**. This procedure has been created by analyzing {data['incident_count']} similar incidents.
-
----
-
-## Problem Statement
-
-Common problems addressed by this SOP:
-
+## Problem
 """
         
-        # Add problems
-        for i, problem in enumerate(data['problems'], 1):
-            sop += f"{i}. {problem}\n"
-        
-        sop += "\n---\n\n## Symptoms\n\nUsers may experience the following symptoms:\n\n"
-        
-        # Add symptoms
-        for i, symptom in enumerate(data['symptoms'], 1):
-            sop += f"{i}. {symptom}...\n"
-        
-        sop += "\n---\n\n## Prerequisites\n\n"
-        sop += "- Access to relevant systems\n"
-        sop += "- Appropriate permissions\n"
-        sop += "- User information and affected systems identified\n"
+        # Add problems - concise format
+        for problem in data['problems'][:3]:  # Top 3 problems
+            sop += f"- {problem}\n"
         
         sop += "\n---\n\n## Resolution Steps\n\n"
         
-        # Add resolution steps
+        # Add resolution steps - direct and actionable
         if data['resolution_steps']:
             for i, step in enumerate(data['resolution_steps'], 1):
-                sop += f"### Step {i}\n\n{step}\n\n"
+                # Make step more direct/command-like
+                step_text = step.strip()
+                if not step_text[0].isupper():
+                    step_text = step_text[0].upper() + step_text[1:]
+                # Remove trailing period if present and make it imperative
+                step_text = step_text.rstrip('.')
+                sop += f"{i}. {step_text}\n"
         else:
-            sop += "_No structured steps available. Please refer to related incidents below._\n\n"
+            sop += "1. Review the related incidents below for resolution guidance\n"
         
-        sop += "---\n\n## Verification\n\n"
-        sop += "After completing the resolution steps:\n\n"
-        sop += "1. Verify the issue is resolved with the user\n"
-        sop += "2. Confirm all systems are functioning normally\n"
-        sop += "3. Document the resolution in the incident ticket\n"
-        sop += "4. Close the incident\n"
+        sop += "\n---\n\n## Verification\n\n"
+        sop += "- Issue resolved with user\n"
+        sop += "- Systems functioning normally\n"
+        sop += "- Resolution documented in ticket\n"
         
-        sop += "\n---\n\n## Related Incidents\n\n"
-        sop += "This SOP is based on the following incidents:\n\n"
-        
-        for incident_num in data['related_incidents']:
-            sop += f"- {incident_num}\n"
-        
-        sop += f"\n**Representative Incident**: {data['representative_incident']}\n"
-        
-        sop += "\n---\n\n## Priority Distribution\n\n"
-        for priority, count in data['priority_distribution'].items():
-            sop += f"- Priority {priority}: {count} incidents\n"
-        
-        sop += "\n---\n\n## Notes\n\n"
-        sop += "- This SOP was automatically generated from incident analysis\n"
-        sop += "- Review and customize based on your environment\n"
-        sop += "- Update as new information becomes available\n"
-        sop += f"- Last updated: {timestamp}\n"
+        # Add related incidents only if multiple exist
+        if len(data['related_incidents']) > 1:
+            sop += "\n---\n\n## Related Incidents\n\n"
+            for incident_num in data['related_incidents'][:5]:  # Top 5 related
+                sop += f"- {incident_num}\n"
         
         return sop
     

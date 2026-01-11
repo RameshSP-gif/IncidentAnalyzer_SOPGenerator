@@ -1,6 +1,6 @@
 """
 RAG-based Resolution Finder
-Retrieves similar past incidents and suggests resolutions
+Retrieves similar past incidents and suggests resolutions from MongoDB
 """
 
 import numpy as np
@@ -10,34 +10,61 @@ from typing import List, Dict, Optional
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
+# Import MongoDB handler
+try:
+    from db.mongodb_handler import MongoDBHandler
+    MONGODB_AVAILABLE = True
+except ImportError:
+    MONGODB_AVAILABLE = False
+
 
 class ResolutionFinder:
-    """Find resolutions from past incidents using RAG"""
+    """Find resolutions from past incidents using RAG with MongoDB backend"""
     
-    def __init__(self, embedding_model: str = "all-MiniLM-L6-v2"):
+    def __init__(self, embedding_model: str = "all-MiniLM-L6-v2", mongodb_uri: str = None):
         """
-        Initialize resolution finder with embeddings model
+        Initialize resolution finder with embeddings model and MongoDB
         
         Args:
             embedding_model: Name of sentence transformer model
+            mongodb_uri: MongoDB connection string (optional)
         """
         self.model = SentenceTransformer(embedding_model)
         self.knowledge_base = []
         self.embeddings_cache = []
         self.kb_file_path = Path(__file__).parent.parent.parent / 'data' / 'knowledge_base.json'
         
-    def load_knowledge_base(self, incidents: List[Dict]) -> None:
+        # Initialize MongoDB handler
+        self.mongodb = None
+        if MONGODB_AVAILABLE:
+            try:
+                self.mongodb = MongoDBHandler(uri=mongodb_uri)
+            except Exception as e:
+                print(f"[WARNING] MongoDB not available: {str(e)}")
+                self.mongodb = None
+        
+    def load_knowledge_base(self, incidents: List[Dict] = None) -> None:
         """
-        Load past incidents into knowledge base
+        Load past incidents into knowledge base from MongoDB or list
         
         Args:
-            incidents: List of resolved incidents with resolution notes
+            incidents: List of resolved incidents (optional, uses MongoDB if not provided)
         """
-        # Filter incidents that have resolutions
-        resolved_incidents = [
-            inc for inc in incidents 
-            if inc.get('resolution_notes') and len(inc.get('resolution_notes', '')) > 20
-        ]
+        # Try to load from MongoDB first
+        if self.mongodb and self.mongodb.is_connected():
+            resolved_incidents = self.mongodb.get_resolved_incidents()
+            print(f"[INFO] Loaded {len(resolved_incidents)} incidents from MongoDB KB")
+        elif incidents:
+            # Fallback to provided incidents list
+            resolved_incidents = [
+                inc for inc in incidents 
+                if inc.get('resolution_notes') and len(inc.get('resolution_notes', '')) > 20
+            ]
+            print(f"[INFO] Loaded {len(resolved_incidents)} incidents from memory")
+        else:
+            # Try to load from JSON file
+            resolved_incidents = self._load_from_json_file()
+            print(f"[INFO] Loaded {len(resolved_incidents)} incidents from JSON file")
         
         self.knowledge_base = resolved_incidents
         
@@ -48,7 +75,22 @@ class ResolutionFinder:
                 for inc in resolved_incidents
             ]
             self.embeddings_cache = self.model.encode(texts, convert_to_numpy=True)
-            print(f"[INFO] Loaded {len(resolved_incidents)} resolved incidents into knowledge base")
+    
+    def _load_from_json_file(self) -> List[Dict]:
+        """Load knowledge base from JSON file (fallback)"""
+        try:
+            if self.kb_file_path.exists():
+                with open(self.kb_file_path, 'r', encoding='utf-8') as f:
+                    kb_data = json.load(f)
+                    resolved = [
+                        inc for inc in kb_data
+                        if inc.get('resolution_notes') and len(inc.get('resolution_notes', '')) > 20
+                    ]
+                    return resolved
+        except Exception as e:
+            print(f"[WARNING] Failed to load JSON KB: {str(e)}")
+        
+        return []
     
     def find_similar_incidents(self, 
                               problem_description: str, 
@@ -107,6 +149,10 @@ class ResolutionFinder:
         Returns:
             Dict with suggested resolution and source incidents
         """
+        # Ensure knowledge base is loaded before suggesting
+        if not self.knowledge_base:
+            self.load_knowledge_base()
+        
         # Combine all available information
         full_description = problem_description
         if symptoms:

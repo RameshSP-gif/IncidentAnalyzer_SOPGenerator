@@ -379,7 +379,282 @@ function downloadSOPAsPDF(type) {
     });
 }
 
-// Initialize on page load
+// ===== CSV IMPORT FUNCTIONS =====
+
+// Handle CSV file selection
 document.addEventListener('DOMContentLoaded', () => {
+    const csvFileInput = document.getElementById('csv-file');
+    const fileInputWrapper = document.querySelector('.file-input-wrapper');
+    
+    if (fileInputWrapper) {
+        // Click to select file
+        fileInputWrapper.addEventListener('click', () => {
+            csvFileInput.click();
+        });
+        
+        // Drag and drop
+        fileInputWrapper.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileInputWrapper.classList.add('drag-over');
+        });
+        
+        fileInputWrapper.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileInputWrapper.classList.remove('drag-over');
+        });
+        
+        fileInputWrapper.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            fileInputWrapper.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                csvFileInput.files = files;
+                updateFileName();
+            }
+        });
+    }
+    
+    if (csvFileInput) {
+        csvFileInput.addEventListener('change', updateFileName);
+    }
+    
+    // CSV Import Form
+    const csvForm = document.getElementById('csv-import-form');
+    if (csvForm) {
+        csvForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            importCSV();
+        });
+    }
+    
     loadIncidents();
 });
+
+function updateFileName() {
+    const csvFileInput = document.getElementById('csv-file');
+    const fileNameElement = document.getElementById('file-name');
+    const file = csvFileInput.files[0];
+    
+    if (file) {
+        fileNameElement.textContent = file.name;
+        fileNameElement.classList.add('selected');
+    } else {
+        fileNameElement.textContent = 'No file selected';
+        fileNameElement.classList.remove('selected');
+    }
+}
+
+// Download CSV Template
+function downloadTemplate() {
+    showLoading();
+    
+    fetch('/export_template')
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'incident_import_template.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            hideLoading();
+            showToast('Template downloaded successfully!', 'success');
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Download error:', error);
+            showToast('Failed to download template', 'error');
+        });
+}
+
+// Import CSV File
+function importCSV() {
+    const fileInput = document.getElementById('csv-file');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        showToast('Please select a CSV file', 'warning');
+        return;
+    }
+    
+    if (!file.name.endsWith('.csv')) {
+        showToast('Please select a valid CSV file', 'error');
+        return;
+    }
+    
+    showLoading();
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const useRAG = document.getElementById('use-rag').checked;
+    formData.append('use_rag', useRAG);
+    
+    fetch('/import_csv', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideLoading();
+        
+        const resultsDiv = document.getElementById('import-results');
+        const statusDiv = document.getElementById('import-status');
+        const errorsDiv = document.getElementById('import-errors');
+        const warningsDiv = document.getElementById('import-warnings');
+        
+        resultsDiv.style.display = 'block';
+        
+        if (data.success) {
+            statusDiv.innerHTML = `
+                <h4 style="color: var(--success); margin-bottom: 10px;">✅ Import Successful!</h4>
+                <p><strong>Total Imported:</strong> ${data.total_imported} incidents</p>
+                <p><strong>Added to Knowledge Base:</strong> ${data.added_to_kb} incidents</p>
+                <p><strong>Total in Database:</strong> ${data.added_to_db} incidents</p>
+                ${data.message ? `<p style="margin-top: 10px;">${data.message}</p>` : ''}
+            `;
+            statusDiv.style.background = 'rgba(16, 185, 129, 0.1)';
+            statusDiv.style.borderColor = 'var(--success)';
+            
+            showToast('CSV imported successfully!', 'success');
+            
+            // Clear form
+            document.getElementById('csv-import-form').reset();
+            document.getElementById('file-name').textContent = 'No file selected';
+            
+            // Refresh KB summary
+            setTimeout(() => {
+                refreshKBSummary();
+            }, 500);
+            
+        } else {
+            statusDiv.innerHTML = `
+                <h4 style="color: var(--danger); margin-bottom: 10px;">❌ Import Failed</h4>
+                <p>${data.error || 'Unknown error occurred'}</p>
+            `;
+            statusDiv.style.background = 'rgba(239, 68, 68, 0.1)';
+            statusDiv.style.borderColor = 'var(--danger)';
+            
+            showToast('Import failed: ' + (data.error || 'Unknown error'), 'error');
+        }
+        
+        // Display errors
+        if (data.errors && data.errors.length > 0) {
+            errorsDiv.innerHTML = `
+                <h4>❌ Errors (${data.errors.length})</h4>
+                <ul style="margin-left: 20px;">
+                    ${data.errors.map(e => `<li style="font-size: 0.9rem;">${e}</li>`).join('')}
+                </ul>
+            `;
+            errorsDiv.style.display = 'block';
+        }
+        
+        // Display warnings
+        if (data.warnings && data.warnings.length > 0) {
+            warningsDiv.innerHTML = `
+                <h4>⚠️ Warnings (${data.warnings.length})</h4>
+                <ul style="margin-left: 20px;">
+                    ${data.warnings.map(w => `<li style="font-size: 0.9rem;">${w}</li>`).join('')}
+                </ul>
+            `;
+            warningsDiv.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        hideLoading();
+        console.error('Import error:', error);
+        showToast('Error during import: ' + error.message, 'error');
+    });
+}
+
+// Refresh Knowledge Base Summary
+function refreshKBSummary() {
+    fetch('/get_knowledge_base')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const incidents = data.incidents;
+                const total = incidents.length;
+                const resolved = incidents.filter(inc => 
+                    inc.resolution_notes && inc.resolution_notes.length > 20
+                ).length;
+                const unresolved = total - resolved;
+                
+                document.getElementById('kb-total').textContent = total;
+                document.getElementById('kb-resolved').textContent = resolved;
+                document.getElementById('kb-unresolved').textContent = unresolved;
+            }
+        })
+        .catch(error => console.error('Error refreshing KB summary:', error));
+}
+
+// Batch Resolve Unresolved Incidents
+function batchResolveUnresolved() {
+    showLoading();
+    
+    fetch('/get_knowledge_base')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                hideLoading();
+                showToast('Failed to load knowledge base', 'error');
+                return;
+            }
+            
+            // Find unresolved incidents
+            const unresolved = data.incidents.filter(inc => 
+                !inc.resolution_notes || inc.resolution_notes.length < 30
+            );
+            
+            if (unresolved.length === 0) {
+                hideLoading();
+                showToast('All incidents in knowledge base already have resolutions!', 'info');
+                return;
+            }
+            
+            const incident_numbers = unresolved.map(inc => inc.number);
+            
+            // Call batch resolve endpoint
+            return fetch('/batch_resolve_incidents', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    incident_numbers: incident_numbers,
+                    use_rag_suggestions: true
+                })
+            })
+            .then(response => response.json())
+            .then(resolveData => {
+                hideLoading();
+                
+                if (resolveData.success) {
+                    showToast(`✅ Resolved ${resolveData.updated_count} incidents using RAG suggestions!`, 'success');
+                    
+                    // Show details
+                    if (resolveData.failed_count > 0) {
+                        showToast(`⚠️ Failed to resolve ${resolveData.failed_count} incidents`, 'warning');
+                    }
+                    
+                    // Refresh KB summary
+                    setTimeout(() => {
+                        refreshKBSummary();
+                    }, 500);
+                } else {
+                    showToast('Error: ' + (resolveData.error || 'Unknown error'), 'error');
+                }
+            });
+        })
+        .catch(error => {
+            hideLoading();
+            console.error('Error:', error);
+            showToast('Error: ' + error.message, 'error');
+        });
+}
+
+// Initialize on page load (modified)

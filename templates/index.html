@@ -47,6 +47,12 @@
                     </svg>
                     Batch Analysis
                 </button>
+                <button class="tab-button" onclick="showTab('import')">
+                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    CSV Import
+                </button>
             </div>
 
             <!-- Single Incident Tab -->
@@ -227,6 +233,122 @@
 
                 <!-- Batch SOP Results -->
                 <div id="batch-sop-results" class="sop-result" style="display: none;"></div>
+            </div>
+
+            <!-- CSV Import Tab -->
+            <div id="import-tab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">CSV Import & Knowledge Base Update</h2>
+                        <p class="card-description">Import incidents from CSV file and automatically update knowledge base</p>
+                    </div>
+                    <div class="card-body">
+                        <!-- Instructions -->
+                        <div class="info-box" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                            <h4 style="margin: 0 0 8px 0; color: #3b82f6; font-size: 0.95rem;">📋 How to Import</h4>
+                            <ul style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">
+                                <li>Download the template CSV file using the button below</li>
+                                <li>Fill in your incident data (Short Description, Description, Category, Resolution Notes, etc.)</li>
+                                <li>Upload the CSV file using the import section below</li>
+                                <li>Incidents with resolutions will be automatically added to the knowledge base</li>
+                                <li>Use RAG features to suggest resolutions for incidents without them</li>
+                            </ul>
+                        </div>
+
+                        <!-- Template Download -->
+                        <div class="form-actions" style="margin-bottom: 25px;">
+                            <button type="button" onclick="downloadTemplate()" class="btn btn-secondary">
+                                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Download CSV Template
+                            </button>
+                        </div>
+
+                        <!-- CSV File Upload -->
+                        <form id="csv-import-form" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label>Select CSV File *</label>
+                                <div class="file-input-wrapper">
+                                    <input type="file" id="csv-file" name="file" accept=".csv" required>
+                                    <div class="file-input-content">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <div class="file-input-label">Click to select or drag CSV file here</div>
+                                        <span id="file-name" class="file-name">No file selected</span>
+                                    </div>
+                                </div>
+                                <div class="form-hint">📄 CSV file with incident data (number, description, category, resolution_notes, etc.)</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="use-rag">
+                                    <input type="checkbox" id="use-rag" checked> Use RAG for unresolved incidents
+                                </label>
+                                <div class="form-hint">Automatically suggest resolutions for incidents without resolution notes</div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" id="import-btn">
+                                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Import Incidents
+                                </button>
+                                <button type="reset" class="btn btn-secondary" onclick="document.getElementById('csv-file').value = ''; document.getElementById('file-name').textContent = 'No file selected';">Clear</button>
+                            </div>
+                        </form>
+
+                        <!-- Import Results -->
+                        <div id="import-results" style="display: none; margin-top: 30px;">
+                            <div id="import-status" class="info-box"></div>
+                            <div id="import-errors" style="margin-top: 15px;"></div>
+                            <div id="import-warnings" style="margin-top: 15px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Knowledge Base Summary -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Knowledge Base Summary</h2>
+                        <button type="button" onclick="refreshKBSummary()" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-label">Total Incidents in KB</div>
+                                <div class="stat-value" id="kb-total">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">With Resolutions</div>
+                                <div class="stat-value" id="kb-resolved">0</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-label">Without Resolutions</div>
+                                <div class="stat-value" id="kb-unresolved">0</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <h4 style="margin-bottom: 10px;">Quick Actions:</h4>
+                            <div class="form-actions">
+                                <button type="button" onclick="batchResolveUnresolved()" class="btn btn-secondary">
+                                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                    🤖 Resolve Unresolved (Using RAG)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
