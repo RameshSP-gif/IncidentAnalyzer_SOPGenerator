@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "buildCommand": "pip install -r requirements.txt",
+  "functions": {
+    "web_app.py": {
+      "runtime": "python3.11"
+    }
+  },
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1",
+      "headers": {
+        "cache-control": "public, max-age=3600"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/web_app.py"
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "@mongodb_uri",
+    "FLASK_ENV": "production"
+  }
+}

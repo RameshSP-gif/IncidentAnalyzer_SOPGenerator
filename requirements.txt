@@ -1,3 +1,7 @@
+# Web Framework
+Flask>=2.3.0
+Werkzeug>=2.3.0
+
 # ServiceNow Integration
 # Note: Using requests directly instead of pysnow due to dependency conflicts
 requests>=2.28.0

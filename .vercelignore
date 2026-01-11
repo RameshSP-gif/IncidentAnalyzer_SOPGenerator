@@ -1,0 +1,44 @@
+# Vercel Build Ignore File
+# Files excluded from deployment
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.egg-info/
+*.egg
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test files (optional - keep if you want to run tests)
+tests/
+test_*.py
+
+# Documentation (optional - remove if you want docs on server)
+docs/
+*.md
+!README.md
+
+# Local development
+*.log
+.env
+.env.local
+
+# Git
+.git
+.gitignore
+
+# Other
+node_modules/
+*.tar.gz
