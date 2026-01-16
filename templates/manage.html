@@ -430,6 +430,8 @@
     <script>
         let allIncidents = [];
         let filteredIncidents = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
 
         // Load incidents on page load
         document.addEventListener('DOMContentLoaded', () => {
@@ -445,6 +447,7 @@
                 if (data.success) {
                     allIncidents = data.incidents;
                     filteredIncidents = allIncidents;
+                    currentPage = 1;
                     updateStats();
                     renderTable();
                 }
@@ -475,6 +478,7 @@
                 return matchesSearch && matchesCategory;
             });
 
+            currentPage = 1;
             updateStats();
             renderTable();
         }
@@ -495,6 +499,12 @@
                 return;
             }
 
+            // Calculate pagination
+            const totalPages = Math.ceil(filteredIncidents.length / itemsPerPage);
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = Math.min(startIdx + itemsPerPage, filteredIncidents.length);
+            const pageIncidents = filteredIncidents.slice(startIdx, endIdx);
+
             let html = `
                 <table>
                     <thead>
@@ -509,7 +519,7 @@
                     <tbody>
             `;
 
-            filteredIncidents.forEach(inc => {
+            pageIncidents.forEach(inc => {
                 const categoryClass = `category-${inc.category.toLowerCase().replace(/[^a-z]/g, '')}`;
                 const priorityClass = `priority-${inc.priority}`;
                 
@@ -531,7 +541,38 @@
             });
 
             html += '</tbody></table>';
+            
+            // Add pagination controls
+            if (totalPages > 1) {
+                html += `
+                    <div style="padding: 15px; background: #f8f9fa; border-top: 1px solid var(--border); display: flex; justify-content: center; gap: 10px;">
+                        <button class="btn btn-secondary" onclick="previousPage()" ${currentPage === 1 ? 'disabled' : ''}>← Previous</button>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span>Page <strong>${currentPage}</strong> of <strong>${totalPages}</strong> (${filteredIncidents.length} total)</span>
+                        </div>
+                        <button class="btn btn-secondary" onclick="nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>
+                    </div>
+                `;
+            }
+            
             container.innerHTML = html;
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredIncidents.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+                window.scrollTo(0, 0);
+            }
         }
 
         function viewIncident(incident) {
