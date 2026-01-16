@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered SOP Generator | Incident Analysis Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        
+        /* Hero Header */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect fill="url(%23grid)" width="100%" height="100%"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .hero .subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+            animation: fadeInUp 1.2s ease-out;
+        }
+        
+        .hero-btn {
+            padding: 15px 35px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .hero-btn-primary {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .hero-btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255,255,255,0.4);
+        }
+        
+        .hero-btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .hero-btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: -40px auto 40px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .stat-box.primary { border-color: var(--primary); }
+        .stat-box.success { border-color: var(--success); }
+        .stat-box.warning { border-color: var(--warning); }
+        .stat-box.info { border-color: var(--info); }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-icon.primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+        .stat-icon.success { background: linear-gradient(135deg, var(--success), #34d399); }
+        .stat-icon.warning { background: linear-gradient(135deg, var(--warning), #fbbf24); }
+        .stat-icon.info { background: linear-gradient(135deg, var(--info), #60a5fa); }
+        
+        .stat-icon svg {
+            width: 30px;
+            height: 30px;
+            stroke: white;
+            stroke-width: 2;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.95em;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #64748b;
+        }
+        
+        .tab:hover {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .tab svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        /* Card */
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px var(--shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 30px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .card-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .card-subtitle {
+            color: #64748b;
+            font-size: 1em;
+        }
+        
+        .card-body {
+            padding: 35px;
+        }
+        
+        /* Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95em;
+        }
+        
+        .form-label .required {
+            color: var(--danger);
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95em;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-hint {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #64748b;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #34d399);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-ai {
+            background: linear-gradient(135deg, #ec4899, #f97316);
+            color: white;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+        }
+        
+        .btn-ai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 72, 153, 0.4);
+        }
+        
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid var(--border);
+        }
+        
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* SOP Result */
+        .sop-result {
+            margin-top: 40px;
+        }
+        
+        .sop-content {
+            background: #fafafa;
+            padding: 30px;
+            border-radius: 12px;
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+        
+        .sop-content h1, .sop-content h2, .sop-content h3 {
+            color: var(--primary);
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        .sop-content code {
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255,255,255,0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: white;
+            margin-top: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            z-index: 10000;
+            min-width: 300px;
+            transform: translateY(150%);
+            transition: transform 0.3s;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+        }
+        
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2em;
+            }
+            
+            .hero .subtitle {
+                font-size: 1em;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>🚀 AI-Powered SOP Generator</h1>
+            <p class="subtitle">Transform Incident Management with Intelligent Automation</p>
+            <div class="hero-buttons">
+                <button class="hero-btn hero-btn-primary" onclick="document.getElementById('single-tab').scrollIntoView({behavior: 'smooth'})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:24px;height:24px">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Start Analyzing
+                </button>
+                <a href="/manage" class="hero-btn hero-btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:24px;height:24px">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                    </svg>
+                    Manage Database
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-box primary">
+                <div class="stat-icon primary">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div class="stat-number" id="stat-incidents">0</div>
+                <div class="stat-label">Total Incidents</div>
+            </div>
+            
+            <div class="stat-box success">
+                <div class="stat-icon success">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="stat-number" id="stat-sops">0</div>
+                <div class="stat-label">SOPs Generated</div>
+            </div>
+            
+            <div class="stat-box warning">
+                <div class="stat-icon warning">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+                <div class="stat-number">AI</div>
+                <div class="stat-label">Smart Suggestions</div>
+            </div>
+            
+            <div class="stat-box info">
+                <div class="stat-icon info">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Always Available</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('single')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Single Incident Analysis
+            </button>
+            <button class="tab" onclick="showTab('batch')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+                Batch Processing
+            </button>
+        </div>
+
+        <!-- Single Incident Tab -->
+        <div id="single-tab" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📋 Incident Details</h2>
+                    <p class="card-subtitle">Enter incident information to generate a comprehensive SOP</p>
+                </div>
+                <div class="card-body">
+                    <form id="single-incident-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Incident Number</label>
+                                <input type="text" id="incident_number" name="incident_number" placeholder="INC0001" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Category <span class="required">*</span></label>
+                                <select id="category" name="category" class="form-select" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Email">📧 Email</option>
+                                    <option value="Network">🌐 Network</option>
+                                    <option value="Hardware">🖥️ Hardware</option>
+                                    <option value="Software">💻 Software</option>
+                                    <option value="Database">🗄️ Database</option>
+                                    <option value="Access">🔐 Access/Security</option>
+                                    <option value="Other">📦 Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Priority</label>
+                                <select id="priority" name="priority" class="form-select">
+                                    <option value="1">🔴 1 - Critical</option>
+                                    <option value="2">🟠 2 - High</option>
+                                    <option value="3" selected>🟡 3 - Medium</option>
+                                    <option value="4">🟢 4 - Low</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Short Description <span class="required">*</span></label>
+                            <input type="text" id="short_description" name="short_description" placeholder="Brief summary of the issue" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Detailed Description <span class="required">*</span></label>
+                            <textarea id="description" name="description" placeholder="Detailed description of the problem, symptoms, and user impact..." class="form-textarea" required></textarea>
+                            <div class="form-hint">Minimum 20 characters - Be specific about the issue</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Resolution Notes
+                                <span style="color: #64748b; font-weight: normal;">(or use AI suggestion below)</span>
+                            </label>
+                            <textarea id="resolution_notes" name="resolution_notes" placeholder="Step-by-step resolution details, actions taken, and final outcome..." class="form-textarea"></textarea>
+                            <div class="form-hint">
+                                <button type="button" onclick="suggestResolution()" class="btn btn-ai" style="margin-top: 15px;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                    </svg>
+                                    🤖 AI Suggest Resolution from Knowledge Base
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Generate SOP Document
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Clear Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Single SOP Result -->
+            <div id="single-sop-result" class="sop-result" style="display: none;">
+                <div class="card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h2 class="card-title">✅ Generated SOP Document</h2>
+                            <p class="card-subtitle">Professional Standard Operating Procedure</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="downloadSOPAsPDF('single')" class="btn btn-success">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                Download PDF
+                            </button>
+                            <button onclick="copySOP('single')" class="btn btn-secondary" title="Copy to clipboard">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="single-sop-content" class="sop-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Batch Analysis Tab -->
+        <div id="batch-tab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">⚡ Batch Incident Analysis</h2>
+                    <p class="card-subtitle">Add multiple incidents for ML-powered categorization and SOP generation</p>
+                </div>
+                <div class="card-body">
+                    <div class="stats-bar" style="margin-bottom: 30px;">
+                        <div class="stat-box primary">
+                            <div class="stat-number" id="total-incidents">0</div>
+                            <div class="stat-label">Total Incidents</div>
+                        </div>
+                        <div class="stat-box success">
+                            <div class="stat-number" id="ready-incidents">0</div>
+                            <div class="stat-label">Ready for Analysis</div>
+                        </div>
+                    </div>
+
+                    <form id="batch-incident-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Short Description <span class="required">*</span></label>
+                                <input type="text" id="batch_short_description" name="short_description" placeholder="Brief summary" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Category <span class="required">*</span></label>
+                                <select id="batch_category" name="category" class="form-select" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Email">📧 Email</option>
+                                    <option value="Network">🌐 Network</option>
+                                    <option value="Hardware">🖥️ Hardware</option>
+                                    <option value="Software">💻 Software</option>
+                                    <option value="Database">🗄️ Database</option>
+                                    <option value="Access">🔐 Access/Security</option>
+                                    <option value="Other">📦 Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Detailed Description <span class="required">*</span></label>
+                            <textarea id="batch_description" name="description" placeholder="Detailed problem description..." class="form-textarea" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Resolution Notes <span class="required">*</span></label>
+                            <textarea id="batch_resolution_notes" name="resolution_notes" placeholder="Resolution details..." class="form-textarea" required></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-secondary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Add Incident
+                            </button>
+                            <button type="button" onclick="generateBatchSOPs()" class="btn btn-primary" id="generate-batch-btn" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                Generate All SOPs
+                            </button>
+                            <button type="button" onclick="clearAllIncidents()" class="btn btn-secondary">Clear All</button>
+                        </div>
+                    </form>
+
+                    <!-- Incidents List -->
+                    <div id="incidents-list" class="incidents-list" style="margin-top: 30px;"></div>
+                </div>
+            </div>
+
+            <!-- Batch SOP Results -->
+            <div id="batch-sop-results" class="sop-result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Processing with AI...</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.closest('.tab').classList.add('active');
+        }
+        
+        // Update stats on page load
+        fetch('/get_incidents').then(r => r.json()).then(data => {
+            if (data.success) {
+                document.getElementById('stat-incidents').textContent = data.total || 0;
+            }
+        });
+    </script>
+</body>
+</html>

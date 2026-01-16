@@ -1,0 +1,86 @@
+{
+  "0": [
+    {
+      "number": "INC0001",
+      "short_description": "Unable to access email",
+      "description": "User reports unable to login to Outlook. Password reset attempted but issue persists.",
+      "category": "Email",
+      "resolution_notes": "Reset password and cleared Outlook cache. Verified mailbox connectivity. User can now access email successfully.",
+      "priority": "3",
+      "sys_created_on": "2025-11-15T10:00:00Z",
+      "resolved_at": "2025-11-15T11:30:00Z"
+    },
+    {
+      "number": "INC0002",
+      "short_description": "Email access problem",
+      "description": "Cannot receive emails in Outlook. Sent emails are working fine.",
+      "category": "Email",
+      "resolution_notes": "Checked mailbox quota - it was full. Increased mailbox limit to 50GB. Emails are now flowing normally.",
+      "priority": "2",
+      "sys_created_on": "2025-11-14T09:00:00Z",
+      "resolved_at": "2025-11-14T10:00:00Z"
+    },
+    {
+      "number": "INC0003",
+      "short_description": "Outlook not syncing",
+      "description": "Outlook application not syncing with Exchange server. Calendar and contacts missing.",
+      "category": "Email",
+      "resolution_notes": "Recreated Outlook profile. Configured Exchange server settings. All items syncing correctly now.",
+      "priority": "2",
+      "sys_created_on": "2025-11-13T14:00:00Z",
+      "resolved_at": "2025-11-13T15:30:00Z"
+    },
+    {
+      "number": "INC0004",
+      "short_description": "Email sending issues",
+      "description": "User cannot send emails. Receiving emails works fine. Error message about SMTP server.",
+      "category": "Email",
+      "resolution_notes": "Updated SMTP server settings in Outlook. Verified port 587 is open. User can send emails now.",
+      "priority": "3",
+      "sys_created_on": "2025-11-12T11:00:00Z",
+      "resolved_at": "2025-11-12T12:00:00Z"
+    },
+    {
+      "number": "INC0005",
+      "short_description": "Password reset request",
+      "description": "User forgot password and cannot login to email account.",
+      "category": "Email",
+      "resolution_notes": "Reset user password through Active Directory. Sent temporary password via SMS. User logged in successfully.",
+      "priority": "3",
+      "sys_created_on": "2025-11-11T08:00:00Z",
+      "resolved_at": "2025-11-11T08:30:00Z"
+    },
+    {
+      "number": "INC0007",
+      "short_description": "Cannot connect to VPN",
+      "description": "VPN client shows error when trying to connect. Authentication fails.",
+      "category": "Network",
+      "resolution_notes": "Reset VPN credentials. Updated VPN client to latest version. User can connect successfully now.",
+      "priority": "2",
+      "sys_created_on": "2025-11-09T10:00:00Z",
+      "resolved_at": "2025-11-09T11:00:00Z"
+    }
+  ],
+  "1": [
+    {
+      "number": "INC0006",
+      "short_description": "Network connectivity issue",
+      "description": "Intermittent network disconnections. WiFi keeps dropping every few minutes.",
+      "category": "Network",
+      "resolution_notes": "Replaced faulty network cable. Updated network adapter drivers. Connection is now stable.",
+      "priority": "1",
+      "sys_created_on": "2025-11-10T13:00:00Z",
+      "resolved_at": "2025-11-10T14:30:00Z"
+    },
+    {
+      "number": "INC0008",
+      "short_description": "Slow network speed",
+      "description": "Network is extremely slow. Web pages take forever to load.",
+      "category": "Network",
+      "resolution_notes": "Identified bandwidth saturation. Implemented QoS policies. Network speed improved significantly.",
+      "priority": "2",
+      "sys_created_on": "2025-11-08T15:00:00Z",
+      "resolved_at": "2025-11-08T16:30:00Z"
+    }
+  ]
+}

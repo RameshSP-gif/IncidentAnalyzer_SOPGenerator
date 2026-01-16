@@ -14,22 +14,64 @@ function showTab(tabName) {
 
 // Toast Notifications
 function showToast(message, type = 'success') {
-    const toast = document.getElementById('toast');
-    toast.textContent = message;
-    toast.className = `toast ${type} show`;
+    const toastElement = document.getElementById('toastNotification');
+    const toastTitle = document.getElementById('toastTitle');
+    const toastMessage = document.getElementById('toastMessage');
     
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
+    if (!toastElement || !toastTitle || !toastMessage) {
+        // Fallback to alert if toast elements don't exist
+        alert(message);
+        return;
+    }
+    
+    // Set title based on type
+    const titles = {
+        'success': '✅ Success',
+        'error': '❌ Error',
+        'info': 'ℹ️ Info',
+        'warning': '⚠️ Warning'
+    };
+    
+    toastTitle.textContent = titles[type] || 'Notification';
+    toastMessage.textContent = message;
+    
+    // Apply color based on type
+    const header = toastElement.querySelector('.toast-header');
+    header.className = 'toast-header';
+    if (type === 'success') {
+        header.classList.add('bg-success', 'text-white');
+    } else if (type === 'error') {
+        header.classList.add('bg-danger', 'text-white');
+    } else if (type === 'warning') {
+        header.classList.add('bg-warning');
+    } else if (type === 'info') {
+        header.classList.add('bg-info', 'text-white');
+    }
+    
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 5000
+    });
+    toast.show();
 }
 
 // Loading Overlay
 function showLoading() {
-    document.getElementById('loading-overlay').style.display = 'flex';
+    const modalElement = document.getElementById('loadingModal');
+    if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+    }
 }
 
 function hideLoading() {
-    document.getElementById('loading-overlay').style.display = 'none';
+    const modalElement = document.getElementById('loadingModal');
+    if (modalElement) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+            modal.hide();
+        }
+    }
 }
 
 // Convert Markdown to HTML (simple converter)
@@ -96,10 +138,10 @@ async function suggestResolution() {
             resolutionField.value = data.suggested_resolution;
             
             // Show confidence and source
-            const confidence = (data.confidence * 100).toFixed(0);
-            const source = data.primary_source?.incident || 'multiple incidents';
+            const confidence = data.confidence || 0;
+            const sourceNumber = data.primary_source?.number || 'past incident';
             
-            showToast(`✅ Resolution suggested (${confidence}% match from ${source})`, 'success');
+            showToast(`✅ Resolution suggested (${confidence}% match from ${sourceNumber})`, 'success');
             
             // Highlight the field
             resolutionField.style.border = '2px solid #10b981';
@@ -107,7 +149,7 @@ async function suggestResolution() {
                 resolutionField.style.border = '';
             }, 2000);
         } else {
-            showToast(data.message || 'No similar past incidents found. Please enter resolution manually.', 'error');
+            showToast(data.message || data.suggested_resolution || 'No similar past incidents found. Please enter resolution manually.', 'info');
         }
     } catch (error) {
         hideLoading();
@@ -379,7 +421,69 @@ function downloadSOPAsPDF(type) {
     });
 }
 
+// Load Categories from MongoDB
+async function loadCategories() {
+    try {
+        const response = await fetch('/get_stats');
+        const data = await response.json();
+        
+        if (data.success && data.categories) {
+            const categories = data.categories;
+            
+            // Update both category dropdowns
+            const categorySelects = [
+                document.getElementById('category'),
+                document.getElementById('batch_category')
+            ];
+            
+            // Category icons mapping
+            const categoryIcons = {
+                'Email': '📧',
+                'Network': '🌐',
+                'Hardware': '🖥️',
+                'Software': '💻',
+                'Database': '🗄️',
+                'Access': '🔐',
+                'Security': '🔒',
+                'General': '📋',
+                'IT': '💼',
+                'System': '⚙️'
+            };
+            
+            categorySelects.forEach(select => {
+                if (select) {
+                    // Keep the first "Select Category" option
+                    const firstOption = select.options[0];
+                    select.innerHTML = '';
+                    select.appendChild(firstOption);
+                    
+                    // Add categories from MongoDB
+                    categories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat;
+                        const icon = categoryIcons[cat] || '📦';
+                        option.textContent = `${icon} ${cat}`;
+                        select.appendChild(option);
+                    });
+                    
+                    // Add "Other" option if not present
+                    if (!categories.includes('Other')) {
+                        const otherOption = document.createElement('option');
+                        otherOption.value = 'Other';
+                        otherOption.textContent = '📦 Other';
+                        select.appendChild(otherOption);
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading categories:', error);
+        // Keep default categories if fetch fails
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadIncidents();
+    loadCategories();
 });

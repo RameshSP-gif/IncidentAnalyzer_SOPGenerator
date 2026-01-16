@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Incident Manager - SOP Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .mongodb-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-bar input, .search-bar select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            flex: 1;
+        }
+        .incidents-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .incidents-table th {
+            background: #f7fafc;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .incidents-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .incidents-table tr:hover {
+            background: #f7fafc;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        .badge-priority-1 { background: #fed7d7; color: #c53030; }
+        .badge-priority-2 { background: #feebc8; color: #c05621; }
+        .badge-priority-3 { background: #bee3f8; color: #2c5282; }
+        .badge-priority-4 { background: #c6f6d5; color: #276749; }
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btns button {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .close-btn {
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #999;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .pagination button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="header-title">
+                    <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7C5 4 4 5 4 7z M8 10h8 M8 14h8"/>
+                    </svg>
+                    Incident Database Manager
+                </h1>
+                <p class="header-subtitle">Complete MongoDB CRUD Operations & Knowledge Base Management</p>
+                <div style="margin-top: 15px;">
+                    <a href="/" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 8px; color: white; text-decoration: none; font-weight: 500;">
+                        ← Back to Analyzer
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Statistics Cards -->
+            <div class="mongodb-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Incidents</div>
+                    <div class="stat-value" id="stat-total">0</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <div class="stat-label">Categories</div>
+                    <div class="stat-value" id="stat-categories">0</div>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <div class="stat-label">Recent (Today)</div>
+                    <div class="stat-value" id="stat-recent">0</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="showAddModal()">
+                    ➕ Add Incident
+                </button>
+                <button class="btn btn-primary" onclick="showUploadModal()">
+                    📤 Import CSV
+                </button>
+                <button class="btn btn-success" onclick="exportToCSV()">
+                    📥 Export CSV
+                </button>
+                <button class="btn btn-primary" onclick="exportKnowledgeBase()">
+                    💾 Backup Knowledge Base
+                </button>
+                <button class="btn btn-primary" onclick="analyzeIncidents()">
+                    🔍 Analyze & Generate SOPs
+                </button>
+                <button class="btn" onclick="clearAllData()" style="background: #f56565; color: white;">
+                    🗑️ Clear All Data
+                </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" id="search-query" placeholder="Search incidents..." onkeyup="searchIncidents()">
+                <select id="search-category" onchange="searchIncidents()">
+                    <option value="">All Categories</option>
+                </select>
+                <select id="search-priority" onchange="searchIncidents()">
+                    <option value="">All Priorities</option>
+                    <option value="1">1 - Critical</option>
+                    <option value="2">2 - High</option>
+                    <option value="3">3 - Medium</option>
+                    <option value="4">4 - Low</option>
+                </select>
+                <button class="btn btn-primary" onclick="refreshIncidents()">🔄 Refresh</button>
+            </div>
+
+            <!-- Incidents Table -->
+            <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">Incidents in MongoDB Database</h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button class="btn btn-primary" onclick="syncToKnowledgeBase()" style="font-size: 0.9em;">
+                            🔄 Sync to Knowledge Base
+                        </button>
+                        <span style="color: #666; font-size: 0.9em;" id="last-sync">Last synced: Never</span>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="incidents-table">
+                        <thead>
+                            <tr>
+                                <th>Number</th>
+                                <th>Short Description</th>
+                                <th>Category</th>
+                                <th>Priority</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="incidents-tbody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 40px;">
+                                    Loading incidents...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination" id="pagination">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="incident-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add Incident</h2>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="incident-form">
+                <input type="hidden" id="form-mode" value="add">
+                <input type="hidden" id="original-number" value="">
+                
+                <div class="form-group">
+                    <label>Incident Number *</label>
+                    <input type="text" id="form-number" required class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label>Short Description *</label>
+                    <input type="text" id="form-short-desc" required class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label>Description *</label>
+                    <textarea id="form-description" rows="4" required class="form-textarea"></textarea>
+                </div>
+                
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="form-category" required class="form-select">
+                            <option value="">Select Category</option>
+                            <option value="Email">Email</option>
+                            <option value="Network">Network</option>
+                            <option value="Hardware">Hardware</option>
+                            <option value="Software">Software</option>
+                            <option value="Database">Database</option>
+                            <option value="Access">Access/Security</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="form-priority" class="form-select">
+                            <option value="1">1 - Critical</option>
+                            <option value="2">2 - High</option>
+                            <option value="3" selected>3 - Medium</option>
+                            <option value="4">4 - Low</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Resolution Notes</label>
+                    <textarea id="form-resolution" rows="4" class="form-textarea"></textarea>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-success">💾 Save</button>
+                    <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Import CSV File</h2>
+                <span class="close-btn" onclick="closeUploadModal()">&times;</span>
+            </div>
+            <div>
+                <p style="margin-bottom: 20px;">Upload a CSV file with incident data. Required columns: number, short_description, description, category</p>
+                <input type="file" id="csv-file" accept=".csv" class="form-input" style="margin-bottom: 20px;">
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="uploadCSV()">📤 Upload</button>
+                    <button class="btn" onclick="closeUploadModal()">Cancel</button>
+                </div>
+                <div id="upload-status" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const perPage = 20;
+        let allCategories = [];
+
+        // Load stats and incidents on page load
+        window.onload = function() {
+            loadStats();
+            loadIncidents();
+        };
+
+        function loadStats() {
+            fetch('/get_stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('stat-total').textContent = data.total_incidents;
+                        document.getElementById('stat-categories').textContent = data.category_count;
+                        document.getElementById('stat-recent').textContent = data.recent_incidents.length;
+                        
+                        // Populate category dropdown
+                        allCategories = data.categories;
+                        const categorySelect = document.getElementById('search-category');
+                        categorySelect.innerHTML = '<option value="">All Categories</option>';
+                        data.categories.forEach(cat => {
+                            categorySelect.innerHTML += `<option value="${cat}">${cat}</option>`;
+                        });
+                    }
+                });
+        }
+
+        function loadIncidents(page = 1) {
+            currentPage = page;
+            fetch(`/get_incidents?page=${page}&per_page=${perPage}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        renderIncidents(data.incidents);
+                        renderPagination(data.total, page);
+                    } else {
+                        showError('Failed to load incidents');
+                    }
+                });
+        }
+
+        function renderIncidents(incidents) {
+            const tbody = document.getElementById('incidents-tbody');
+            
+            if (incidents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px;">No incidents found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = incidents.map(inc => `
+                <tr>
+                    <td><strong>${inc.number}</strong></td>
+                    <td>${inc.short_description}</td>
+                    <td><span class="badge">${inc.category || 'N/A'}</span></td>
+                    <td><span class="badge badge-priority-${inc.priority}">${inc.priority}</span></td>
+                    <td>${new Date(inc.sys_created_on).toLocaleDateString()}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button onclick="viewIncident('${inc.number}')" style="background: #4299e1; color: white;">👁️ View</button>
+                            <button onclick="editIncident('${inc.number}')" style="background: #48bb78; color: white;">✏️ Edit</button>
+                            <button onclick="deleteIncident('${inc.number}')" style="background: #f56565; color: white;">🗑️ Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination(total, current) {
+            const totalPages = Math.ceil(total / perPage);
+            const pagination = document.getElementById('pagination');
+            
+            let html = '';
+            html += `<button ${current === 1 ? 'disabled' : ''} onclick="loadIncidents(${current - 1})">Previous</button>`;
+            
+            for (let i = 1; i <= Math.min(totalPages, 10); i++) {
+                html += `<button class="${i === current ? 'active' : ''}" onclick="loadIncidents(${i})">${i}</button>`;
+            }
+            
+            if (totalPages > 10) {
+                html += `<button disabled>...</button>`;
+                html += `<button onclick="loadIncidents(${totalPages})">${totalPages}</button>`;
+            }
+            
+            html += `<button ${current === totalPages ? 'disabled' : ''} onclick="loadIncidents(${current + 1})">Next</button>`;
+            
+            pagination.innerHTML = html;
+        }
+
+        function searchIncidents() {
+            const query = document.getElementById('search-query').value;
+            const category = document.getElementById('search-category').value;
+            const priority = document.getElementById('search-priority').value;
+            
+            fetch('/search_incidents', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({query, category, priority})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderIncidents(data.incidents);
+                    document.getElementById('pagination').innerHTML = '';
+                }
+            });
+        }
+
+        function showAddModal() {
+            document.getElementById('modal-title').textContent = 'Add Incident';
+            document.getElementById('form-mode').value = 'add';
+            document.getElementById('incident-form').reset();
+            document.getElementById('incident-modal').style.display = 'block';
+        }
+
+        function editIncident(number) {
+            fetch(`/get_incidents`)
+                .then(response => response.json())
+                .then(data => {
+                    const incident = data.incidents.find(inc => inc.number === number);
+                    if (incident) {
+                        document.getElementById('modal-title').textContent = 'Edit Incident';
+                        document.getElementById('form-mode').value = 'edit';
+                        document.getElementById('original-number').value = number;
+                        document.getElementById('form-number').value = incident.number;
+                        document.getElementById('form-short-desc').value = incident.short_description;
+                        document.getElementById('form-description').value = incident.description || '';
+                        document.getElementById('form-category').value = incident.category || '';
+                        document.getElementById('form-priority').value = incident.priority || '3';
+                        document.getElementById('form-resolution').value = incident.resolution_notes || '';
+                        document.getElementById('incident-modal').style.display = 'block';
+                    }
+                });
+        }
+
+        function viewIncident(number) {
+            fetch(`/get_incidents`)
+                .then(response => response.json())
+                .then(data => {
+                    const incident = data.incidents.find(inc => inc.number === number);
+                    if (incident) {
+                        alert(`Incident: ${incident.number}\n\n${incident.short_description}\n\n${incident.description}\n\nCategory: ${incident.category}\nPriority: ${incident.priority}\n\nResolution:\n${incident.resolution_notes || 'N/A'}`);
+                    }
+                });
+        }
+
+        function deleteIncident(number) {
+            if (!confirm(`Are you sure you want to delete incident ${number}?`)) return;
+            
+            fetch(`/delete_incident/${number}`, {method: 'DELETE'})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Incident deleted successfully');
+                        loadIncidents(currentPage);
+                        loadStats();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                });
+        }
+
+        function closeModal() {
+            document.getElementById('incident-modal').style.display = 'none';
+        }
+
+        function showUploadModal() {
+            document.getElementById('upload-modal').style.display = 'block';
+        }
+
+        function closeUploadModal() {
+            document.getElementById('upload-modal').style.display = 'none';
+            document.getElementById('upload-status').innerHTML = '';
+        }
+
+        function uploadCSV() {
+            const fileInput = document.getElementById('csv-file');
+            if (!fileInput.files[0]) {
+                alert('Please select a CSV file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            document.getElementById('upload-status').innerHTML = '<p>Uploading...</p>';
+            
+            fetch('/import_csv', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('upload-status').innerHTML = `
+                        <div style="padding: 15px; background: #c6f6d5; border-radius: 8px; color: #276749;">
+                            <strong>Import Successful!</strong><br>
+                            Imported: ${data.result.imported}<br>
+                            Skipped: ${data.result.skipped}<br>
+                            Errors: ${data.result.errors}
+                        </div>
+                    `;
+                    loadIncidents();
+                    loadStats();
+                } else {
+                    document.getElementById('upload-status').innerHTML = `
+                        <div style="padding: 15px; background: #fed7d7; border-radius: 8px; color: #c53030;">
+                            Error: ${data.error}
+                        </div>
+                 exportKnowledgeBase() {
+            if (!confirm('Export all incidents with resolutions to knowledge base JSON file?')) return;
+            
+            fetch('/get_knowledge_base')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const blob = new Blob([JSON.stringify(data.incidents, null, 2)], { type: 'application/json' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `knowledge_base_${new Date().toISOString().split('T')[0]}.json`;
+                        a.click();
+                        alert(`Exported ${data.count} incidents to knowledge base JSON file`);
+                    }
+                });
+        }
+
+        function syncToKnowledgeBase() {
+            if (!confirm('Sync all MongoDB incidents to knowledge base for AI resolution suggestions?')) return;
+            
+            fetch('/sync_knowledge_base', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('last-sync').textContent = `Last synced: ${new Date().toLocaleString()}`;
+                    alert(`Successfully synced ${data.synced_count} incidents to knowledge base`);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+
+        function clearAllData() {
+            const confirm1 = prompt('⚠️ WARNING: This will delete ALL incidents from MongoDB!\n\nType "DELETE ALL" to confirm:');
+            if (confirm1 !== 'DELETE ALL') {
+                alert('Cancelled - data not deleted');
+                return;
+            }
+            
+            const confirm2 = confirm('Are you ABSOLUTELY sure? This cannot be undone!');
+            if (!confirm2) return;
+            
+            fetch('/clear_all_incidents', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Deleted ${data.deleted_count} incidents`);
+                    loadIncidents();
+                    loadStats();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+
+        function duplicateIncident(number) {
+            fetch(`/get_incidents`)
+                .then(response => response.json())
+                .then(data => {
+                    const incident = data.incidents.find(inc => inc.number === number);
+                    if (incident) {
+                        const newNumber = prompt('Enter new incident number:', `${incident.number}_COPY`);
+                        if (!newNumber) return;
+                        
+                        const duplicated = {...incident, number: newNumber, incident_number: newNumber};
+                        delete duplicated._id;
+                        
+                        fetch('/add_incident', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify(duplicated)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Incident duplicated successfully');
+                                loadIncidents(currentPage);
+                                loadStats();
+                            } else {
+                                alert('Error: ' + (data.error || 'Failed to duplicate'));
+                            }
+                        });
+                    }
+                });
+        }
+
+        function analyzeIncidents() {
+            if (!confirm('Analyze all incidents and generate SOPs? This may take a few minutes.')) return;
+            
+            alert('Analysis started! Check the console for progress.');
+            fetch('/generate_sop', {method: 'POST'})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Analysis complete!\n\nTotal Incidents: ${data.total_incidents}\nClusters: ${data.clusters}\nSOPs Generated: ${data.sops.length}\n\nCheck output/sops/ folder for generated SOPs
+        function analyzeIncidents() {
+            if (!confirm('Analyze all incidents and generate SOPs? This may take a few minutes.')) return;
+            
+            alert('Analysis started! Check the console for progress.');
+            fetch('/generate_sop', {method: 'POST'})
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Analysis complete!\n\nClusters: ${data.clusters}\nSOPs Generated: ${data.sops.length}`);
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                });
+        }
+
+        function refreshIncidents() {
+            loadIncidents(currentPage);
+            loadStats();
+        }
+
+        // Form submission
+        document.getElementById('incident-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const mode = document.getElementById('form-mode').value;
+            const incident = {
+                incident_number: document.getElementById('form-number').value,
+                short_description: document.getElementById('form-short-desc').value,
+                description: document.getElementById('form-description').value,
+                category: document.getElementById('form-category').value,
+                priority: document.getElementById('form-priority').value,
+                resolution_notes: document.getElementById('form-resolution').value
+            };
+            
+            if (mode === 'add') {
+                fetch('/add_incident', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(incident)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Incident added successfully');
+                        closeModal();
+                        loadIncidents(currentPage);
+                        loadStats();
+                    } else {
+                        alert('Error: ' + (data.errors ? JSON.stringify(data.errors) : data.error));
+                    }
+                });
+            } else {
+                const originalNumber = document.getElementById('original-number').value;
+                fetch(`/update_incident/${originalNumber}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(incident)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Incident updated successfully');
+                        closeModal();
+                        loadIncidents(currentPage);
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                });
+            }
+        });
+
+        function showError(message) {
+            alert(message);
+        }
+    </script>
+</body>
+</html>

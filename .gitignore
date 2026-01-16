@@ -37,9 +37,10 @@ ENV/
 *~
 
 # Data directories
-data/
-output/
-logs/
+# Uncomment below to exclude data directories
+# data/
+# output/
+# logs/
 
 # Models
 models/*.pkl

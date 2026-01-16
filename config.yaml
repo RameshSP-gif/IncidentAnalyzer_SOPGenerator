@@ -1,5 +1,18 @@
 # Application Configuration
 
+# MongoDB Database Configuration
+database:
+  mongodb:
+    # MongoDB connection string (can also be set via MONGODB_URI env variable)
+    connection_string: "mongodb://localhost:27017/"
+    database_name: "incident_analyzer"
+    collection_name: "incidents"
+  
+  # CSV Import settings
+  csv_import:
+    skip_duplicates: true
+    validate_on_import: true
+
 servicenow:
   # Fields to fetch from ServiceNow incidents
   fields:

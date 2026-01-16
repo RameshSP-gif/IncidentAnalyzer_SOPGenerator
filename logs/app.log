@@ -1,0 +1,20 @@
+2026-01-05 07:51:41 | INFO     | __main__:__init__ - Initializing SOP Orchestrator
+2026-01-05 07:51:41 | INFO     | src.categorization.categorizer:__init__ - Loading embedding model: all-MiniLM-L6-v2
+2026-01-05 07:51:44 | INFO     | __main__:run_full_pipeline - ============================================================
+2026-01-05 07:51:44 | INFO     | __main__:run_full_pipeline - Starting SOP Generation Pipeline
+2026-01-05 07:51:44 | INFO     | __main__:run_full_pipeline - ============================================================
+2026-01-05 07:51:44 | INFO     | __main__:fetch_incidents - === STEP 1: Fetching Incidents ===
+2026-01-05 07:51:44 | ERROR    | src.servicenow.client:test_connection - Failed to connect to ServiceNow: HTTPSConnectionPool(host='your-instance.service-now.com', port=443): Max retries exceeded with url: /api/now/table/incident?sysparm_limit=1 (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000002289DD28160>: Failed to resolve 'your-instance.service-now.com' ([Errno 11001] getaddrinfo failed)"))
+2026-01-05 07:51:44 | ERROR    | __main__:run_full_pipeline - Pipeline failed: Failed to connect to ServiceNow
+2026-01-13 07:48:43 | INFO     | __main__:__init__ - Initializing SOP Orchestrator
+2026-01-13 07:48:43 | INFO     | src.categorization.categorizer:__init__ - Loading embedding model: all-MiniLM-L6-v2
+2026-01-13 07:48:46 | INFO     | src.database.mongodb:__init__ - Connecting to MongoDB: incident_analyzer
+2026-01-13 07:48:46 | INFO     | src.database.mongodb:_create_indexes - Database indexes created successfully
+2026-01-13 07:48:46 | INFO     | __main__:__init__ - Initializing SOP Orchestrator
+2026-01-13 07:48:46 | INFO     | src.categorization.categorizer:__init__ - Loading embedding model: all-MiniLM-L6-v2
+2026-01-13 07:48:48 | INFO     | __main__:run_full_pipeline - ============================================================
+2026-01-13 07:48:48 | INFO     | __main__:run_full_pipeline - Starting SOP Generation Pipeline
+2026-01-13 07:48:48 | INFO     | __main__:run_full_pipeline - ============================================================
+2026-01-13 07:48:48 | INFO     | __main__:fetch_incidents - === STEP 1: Fetching Incidents ===
+2026-01-13 07:48:48 | ERROR    | src.servicenow.client:test_connection - Failed to connect to ServiceNow: HTTPSConnectionPool(host='your-instance.service-now.com', port=443): Max retries exceeded with url: /api/now/table/incident?sysparm_limit=1 (Caused by NameResolutionError("<urllib3.connection.HTTPSConnection object at 0x000002820A297100>: Failed to resolve 'your-instance.service-now.com' ([Errno 11001] getaddrinfo failed)"))
+2026-01-13 07:48:48 | ERROR    | __main__:run_full_pipeline - Pipeline failed: Failed to connect to ServiceNow

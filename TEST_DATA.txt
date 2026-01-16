@@ -1,0 +1,73 @@
+================================================================================
+✅ WORKING TEST DATA - Ready to Copy & Paste
+================================================================================
+
+🌐 Application URL: http://127.0.0.1:5000
+
+📋 INSTRUCTIONS:
+1. Open http://127.0.0.1:5000 in your browser
+2. Copy ANY description below (just the text, not the title)
+3. Paste it into the "Incident Description" field
+4. Select category: "General"
+5. Click "AI Suggest Resolution" button
+6. Wait for AI to find similar incidents and suggest resolution
+
+================================================================================
+
+TEST 1: Invoice Error
+--------------------------------------------------------------------------------
+Incorrect invoices, Invoice number: 405025
+--------------------------------------------------------------------------------
+
+TEST 2: Order Status Check
+--------------------------------------------------------------------------------
+The orders are still in 250 status. Can you please check it? Thank you
+--------------------------------------------------------------------------------
+
+TEST 3: Delivery Status Issue
+--------------------------------------------------------------------------------
+THIS ISELL ORDER IS SHOWING DELIVERED 12/3/25 BUT IT WAS NOT DELIVERED BY NAL. IT NEEDS TO BE MARKED DELIVERED BY ANOTHER CARRIER.
+--------------------------------------------------------------------------------
+
+TEST 4: Split Delivery Problem
+--------------------------------------------------------------------------------
+THIS ORDER 486344005 HAS A SPLIT DELIVERY WITH A PARCEL DELIVERED AND A PENDING DELIVERY. THE PENDING DELIVERY ARTICLES WERE PICKED UP BY CUSTOMER
+--------------------------------------------------------------------------------
+
+TEST 5: Pending Reschedule
+--------------------------------------------------------------------------------
+THIS ORDER SHOWS PENDING RESCHEDULE BUT WAS DELIVERED BY ANOTHER CARRIER (DOLLY ON 11/4/25) WOULD YOU PLEASE MARK THIS ORDER DELIVERED BY ANOTHER CARRIER
+--------------------------------------------------------------------------------
+
+TEST 6: Service Completion Sync
+--------------------------------------------------------------------------------
+The service has been completed and is technically completed in ZUPER. However, the status COMPLETED has not been transferred from ZUPER to Isell.
+--------------------------------------------------------------------------------
+
+TEST 7: Delivery Marking
+--------------------------------------------------------------------------------
+ORDER 480723329 NEEDS TO BE MARKED IN ISELL AS DELIVERED BY ANOTHER CARRIER (DOLLY) ON 9/10/25
+--------------------------------------------------------------------------------
+
+TEST 8: Service Deviation
+--------------------------------------------------------------------------------
+Service deviation can not be handled. The service has been completed and is technically completed in ZUPER. However, in Isell we can neither handle the service deviation nor find the reference order.
+--------------------------------------------------------------------------------
+
+TEST 9: Simple Order Query
+--------------------------------------------------------------------------------
+Can you please check the status of order 123456?
+--------------------------------------------------------------------------------
+
+TEST 10: General Support
+--------------------------------------------------------------------------------
+I need help with updating the delivery information for my order
+--------------------------------------------------------------------------------
+
+================================================================================
+💡 TIPS:
+- First request may take 1-2 minutes as ChromaDB loads 5000 incidents
+- Subsequent requests will be instant
+- AI will find similar past incidents and suggest resolutions
+- Try different test cases to see how semantic matching works!
+================================================================================

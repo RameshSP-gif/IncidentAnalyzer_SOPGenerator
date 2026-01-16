@@ -3,150 +3,522 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOP Generator - Incident Analysis</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>AI-Powered SOP Generator | Incident Analysis Platform</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.1.0/mdb.min.css" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: -50px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/></pattern></defs><rect fill="url(%23grid)" width="100%" height="100%"/></svg>');
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.8);
+            animation: fadeInUp 0.8s ease-out;
+            color: #ffffff;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            opacity: 1;
+            margin-bottom: 30px;
+            animation: fadeInUp 1s ease-out;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stat-card {
+            transition: all 0.3s;
+            border: none;
+            border-radius: 15px;
+            background: white;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3) !important;
+        }
+        
+        .stat-card.primary { border-left: 6px solid #5e35b1; background: linear-gradient(135deg, #ffffff 0%, #f3e5f5 100%); }
+        .stat-card.success { border-left: 6px solid #00897b; background: linear-gradient(135deg, #ffffff 0%, #e0f2f1 100%); }
+        .stat-card.warning { border-left: 6px solid #d81b60; background: linear-gradient(135deg, #ffffff 0%, #fce4ec 100%); }
+        .stat-card.info { border-left: 6px solid #1e88e5; background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%); }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+        }
+        5e35b1, #7e57c2); box-shadow: 0 4px 15px rgba(94, 53, 177, 0.4); }
+        .stat-icon.success { background: linear-gradient(135deg, #00897b, #26a69a); box-shadow: 0 4px 15px rgba(0, 137, 123, 0.4); }
+        .stat-icon.warning { background: linear-gradient(135deg, #d81b60, #ec407a); box-shadow: 0 4px 15px rgba(216, 27, 96, 0.4); }
+        .stat-icon.info { background: linear-gradient(135deg, #1e88e5, #42a5f5); box-shadow: 0 4px 15px rgba(30, 136, 229, 0.476c); }
+        .stat-icon.info { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        
+        .main-card {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, #5e35b1 0%, #7e57c2 100%);
+            border-bottom: 3px solid #4527a0;
+            border-radius: 20px 20px 0 0 !important;
+            color: white;
+        }
+        
+        .card-header-custom h3 {
+            color: white !important;
+            font-weight: 700;
+        }
+        
+        .card-header-custom p {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        
+        .card-header-custom .text-primary {
+            color: white !important;
+        }
+        
+        .btn-gradient-primary {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32);
+            border: none;
+            color: white;
+            transition: all 0.3s;
+            padding: 12px 30px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(27, 94, 32, 0.5);
+        }
+        
+        .btn-gradient-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(27, 94, 32, 0.7);
+            color: white;
+            background: linear-gradient(135deg, #0d3d11, #1b5e20);
+        }
+        
+        .btn-gradient-success {
+            background: linear-gradient(135deg, #00897b, #26a69a);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 137, 123, 0.4);
+        }
+        
+        .btn-gradient-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 137, 123, 0.6);
+            color: white;
+            background: linear-gradient(135deg, #00695c, #00897b);
+        }
+        
+        .btn-gradient-danger {
+            background: linear-gradient(135deg, #d32f2f, #e91e63);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.4);
+        }
+        
+        .btn-gradient-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(211, 47, 47, 0.6);
+            color: white;
+            background: linear-gradient(135deg, #b71c1c, #d32f2f);
+        }
+        
+        .btn-gradient-info {
+            background: linear-gradient(135deg, #1e88e5, #42a5f5);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(30, 136, 229, 0.4);
+        }
+        
+        .btn-gradient-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(30, 136, 229, 0.6);
+            color: white;
+            background: linear-gradient(135deg, #1565c0, #1e88e5);
+        }
+        
+        .btn-gradient-secondary {
+            background: linear-gradient(135deg, #455a64, #607d8b);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(69, 90, 100, 0.4);
+        }
+        
+        .btn-gradient-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(69, 90, 100, 0.6);
+            color: white;
+            background: linear-gradient(135deg, #37474f, #455a64);
+        }
+        
+        .btn-ai {
+            background: linear-gradient(135deg, #d81b60, #ec407a);
+            border: none;
+            color: white;
+            animation: pulse 2s infinite;
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            box-shadow: 0 5px 20px rgba(216, 27, 96, 0.5);
+        }
+        
+        .btn-ai:hover {
+            transform: tran5e35b1;
+            box-shadow: 0 0 0 0.25rem rgba(94, 53, 177, 0.25);
+            transform: translateY(-1px);
+        }
+        
+        .form-label {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .nav-pills .nav-link {
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            padding: 12px 25px;
+            color: #2c3e50;
+        }
+        
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, #5e35b1, #7e57c2);
+            box-shadow: 0 4px 15px rgba(94, 53, 177, 0.5);
+            color: white;
+            color: #2c3e50;
+        }
+        
+        .sop-content h1, .sop-content h2, .sop-content h3 {
+            color: #5e35b1;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 700eY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(245, 87, 108, 0.5);
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4); }
+            50% { box-shadow: 0 5px 30px rgba(245, 87, 108, 0.7); }
+        }
+                @keyframes shimmer {
+            0% { background-position: -100% 0; }
+            100% { background-position: 200% 0; }
+        }
+                .form-control:focus, .form-select:focus {
+            border-color: #11998e;
+            box-shadow: 0 0 0 0.25rem rgba(17, 153, 142, 0.25);
+            transform: translateY(-1px);
+        }
+        
+        .nav-pills .nav-link {
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s;
+            padding: 12px 25px;
+        }
+        
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+        }
+        
+        .sop-content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            line-height: 1.8;
+        }
+        
+        .sop-content h1, .sop-content h2, .sop-content h3 {
+            color: #11998e;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <h1 class="header-title">
-                    <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Incident Analyzer & SOP Generator
-                </h1>
-                <p class="header-subtitle">AI-Powered Standard Operating Procedure Creation</p>
-                <div style="margin-top: 15px;">
-                    <a href="/manage" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 8px; color: white; text-decoration: none; font-weight: 500; transition: all 0.3s;">
-                        <svg style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
-                        Manage Knowledge Base
-                    </a>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container hero-content">
+            <h1 class="hero-title text-center mb-3">
+                <i class="material-icons" style="font-size: 3.5rem; vertical-align: middle;">auto_fix_high</i>
+                <span style="color: #ffd700; text-shadow: 3px 3px 10px rgba(255, 215, 0, 0.6);">AI-Powered</span>
+                <span style="color: #ffffff;"> - </span>
+                <span style="color: #64b5f6; text-shadow: 3px 3px 10px rgba(100, 181, 246, 0.6);">Incident Analyzer</span>
+                <span style="color: #ffffff;"> & </span>
+                <span style="color: #81c784; text-shadow: 3px 3px 10px rgba(129, 199, 132, 0.6);">SOP Generator</span>
+            </h1>
+            <p class="hero-subtitle text-center">Transform Incident Management with Intelligent Automation</p>
+            <div class="text-center">
+                <a href="#single-section" class="btn btn-lg btn-light me-3 mb-3 shadow">
+                    <i class="material-icons align-middle">bolt</i>
+                    Start Analyzing
+                </a>
+                <a href="/manage" class="btn btn-lg btn-outline-light mb-3 shadow">
+                    <i class="material-icons align-middle">storage</i>
+                    Manage Database
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container" style="position: relative; z-index: 2; padding-bottom: 50px;">
+        <!-- Stats Cards -->
+        <div class="row stats-cards g-4 mb-4" style="margin-top: 30px;">
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card primary shadow">
+                    <div class="card-body text-center">
+                        <div class="stat-icon primary mx-auto mb-3">
+                            <i class="material-icons">description</i>
+                        </div>
+                        <h2 class="fw-bold mb-0 text-dark" id="stat-incidents">0</h2>
+                        <p class="fw-semibold mb-0" style="color: #5e35b1;">Total Incidents</p>
+                    </div>
                 </div>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab-button active" onclick="showTab('single')">
-                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Single Incident
-                </button>
-                <button class="tab-button" onclick="showTab('batch')">
-                    <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                    Batch Analysis
-                </button>
-            </div>
-
-            <!-- Single Incident Tab -->
-            <div id="single-tab" class="tab-content active">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Incident Details</h2>
-                        <p class="card-description">Enter incident information to generate an SOP</p>
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card success shadow">
+                    <div class="card-body text-center">
+                        <div class="stat-icon success mx-auto mb-3">
+                            <i class="material-icons">check_circle</i>
+                        </div>
+                        <h2 class="fw-bold mb-0 text-dark" id="stat-sops">0</h2>
+                        <p class="fw-semibold mb-0" style="color: #00897b;">SOPs Generated</p>
                     </div>
-                    <div class="card-body">
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card warning shadow">
+                    <div class="card-body text-center">
+                        <div class="stat-icon warning mx-auto mb-3">
+                            <i class="material-icons">lightbulb</i>
+                        </div>
+                        <h2 class="fw-bold mb-0 text-dark">AI</h2>
+                        <p class="fw-semibold mb-0" style="color: #d81b60;">Smart Suggestions</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card stat-card info shadow">
+                    <div class="card-body text-center">
+                        <div class="stat-icon info mx-auto mb-3">
+                            <i class="material-icons">schedule</i>
+                        </div>
+                        <h2 class="fw-bold mb-0 text-dark">24/7</h2>
+                        <p class="fw-semibold mb-0" style="color: #1e88e5;">Always Available</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <ul class="nav nav-pills nav-fill mb-4 shadow-sm bg-white p-2 rounded-3" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="single-tab" data-bs-toggle="pill" data-bs-target="#single" type="button" role="tab">
+                    <i class="material-icons align-middle">description</i>
+                    Single Incident Analysis
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="batch-tab" data-bs-toggle="pill" data-bs-target="#batch" type="button" role="tab">
+                    <i class="material-icons align-middle">inventory_2</i>
+                    Batch Processing
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Single Incident Tab -->
+            <div class="tab-pane fade show active" id="single" role="tabpanel" id="single-section">
+                <div class="card main-card">
+                    <div class="card-header card-header-custom p-4">
+                        <h3 class="mb-2">
+                            <i class="material-icons align-middle text-primary">assignment</i>
+                            Incident Details
+                        </h3>
+                        <p class="text-muted mb-0">Enter incident information to generate a comprehensive SOP</p>
+                    </div>
+                    <div class="card-body p-4">
                         <form id="single-incident-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="incident_number">Incident Number</label>
-                                    <input type="text" id="incident_number" name="incident_number" placeholder="INC0001" class="form-input">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Incident Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="material-icons">tag</i></span>
+                                        <input type="text" class="form-control" id="incident_number" name="incident_number" placeholder="INC0001">
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="category">Category *</label>
-                                    <select id="category" name="category" class="form-select" required>
-                                        <option value="">Select Category</option>
-                                        <option value="Email">Email</option>
-                                        <option value="Network">Network</option>
-                                        <option value="Hardware">Hardware</option>
-                                        <option value="Software">Software</option>
-                                        <option value="Database">Database</option>
-                                        <option value="Access">Access/Security</option>
-                                        <option value="Other">Other</option>
-                                    </select>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="material-icons">category</i></span>
+                                        <select class="form-select" id="category" name="category" required>
+                                            <option value="">Select Category</option>
+                                            <!-- Categories loaded dynamically from MongoDB -->
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="priority">Priority</label>
-                                    <select id="priority" name="priority" class="form-select">
-                                        <option value="1">1 - Critical</option>
-                                        <option value="2">2 - High</option>
-                                        <option value="3" selected>3 - Medium</option>
-                                        <option value="4">4 - Low</option>
-                                    </select>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Priority</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="material-icons">priority_high</i></span>
+                                        <select class="form-select" id="priority" name="priority">
+                                            <option value="1">🔴 1 - Critical</option>
+                                            <option value="2">🟠 2 - High</option>
+                                            <option value="3" selected>🟡 3 - Medium</option>
+                                            <option value="4">🟢 4 - Low</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="short_description">Short Description *</label>
-                                <input type="text" id="short_description" name="short_description" placeholder="Brief summary of the issue" class="form-input" required>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Short Description <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="material-icons">short_text</i></span>
+                                    <input type="text" class="form-control" id="short_description" name="short_description" placeholder="Brief summary of the issue" required>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="description">Detailed Description *</label>
-                                <textarea id="description" name="description" rows="4" placeholder="Detailed description of the problem, symptoms, and user impact..." class="form-textarea" required></textarea>
-                                <div class="form-hint">Minimum 20 characters</div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Detailed Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Detailed description of the problem, symptoms, and user impact..." required></textarea>
+                                <div class="form-text">
+                                    <i class="material-icons align-middle" style="font-size: 16px;">info</i>
+                                    Minimum 20 characters - Be specific about the issue
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="resolution_notes">
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">
                                     Resolution Notes
-                                    <span style="color: var(--text-secondary); font-weight: normal;">(or click AI Suggest below)</span>
+                                    <span class="text-muted">(or use AI suggestion below)</span>
                                 </label>
-                                <textarea id="resolution_notes" name="resolution_notes" rows="5" placeholder="Step-by-step resolution details, actions taken, and final outcome... OR click 'AI Suggest Resolution' button below" class="form-textarea"></textarea>
-                                <div class="form-hint">
-                                    <button type="button" onclick="suggestResolution()" class="btn btn-secondary" style="margin-top: 10px; padding: 8px 16px; font-size: 0.85rem;">
-                                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                                        </svg>
-                                        🤖 AI Suggest Resolution from Past Incidents
+                                <textarea class="form-control" id="resolution_notes" name="resolution_notes" rows="4" placeholder="Step-by-step resolution details, actions taken, and final outcome..."></textarea>
+                                <div class="mt-3 text-center">
+                                    <button type="button" onclick="suggestResolution()" class="btn btn-ai">
+                                        <i class="material-icons align-middle">psychology</i>
+                                        🤖 AI Suggest Resolution from Knowledge Base
                                     </button>
                                 </div>
                             </div>
 
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                    </svg>
-                                    Generate SOP
+                            <div class="d-flex gap-2 pt-3 border-top justify-content-center flex-wrap">
+                                <button type="submit" class="btn btn-gradient-primary btn-lg" style="font-size: 1.3rem; padding: 18px 40px; font-weight: 900; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); letter-spacing: 0.5px;">
+                                    <i class="material-icons align-middle" style="font-size: 1.5rem;">bolt</i>
+                                    <span style="background: linear-gradient(90deg, #ffffff 0%, #ffff00 50%, #ffffff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 3s infinite;">⚡ GENERATE SOP DOCUMENT ⚡</span>
                                 </button>
-                                <button type="reset" class="btn btn-secondary">Clear Form</button>
+                                <button type="reset" class="btn btn-gradient-secondary btn-lg">
+                                    <i class="material-icons align-middle">refresh</i>
+                                    Clear Form
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
 
-                <!-- Single SOP Result -->
-                <div id="single-sop-result" class="sop-result" style="display: none;">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Generated SOP</h2>
-                            <div style="display: flex; gap: 10px;">
-                                <button onclick="downloadSOPAsPDF('single')" class="btn btn-secondary" title="Download as PDF">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width: 18px; height: 18px; margin-right: 5px;">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Download PDF
+                <!-- SOP Result -->
+                <div id="single-sop-result" style="display: none;">
+                    <div class="card main-card mt-4">
+                        <div class="card-header card-header-custom p-4 d-flex justify-content-between align-items-center flex-wrap">
+                            <div class="mb-2 mb-md-0">
+                                <h3 class="mb-2">
+                                    <i class="material-icons align-middle text-success">check_circle</i>
+                                    Generated SOP Document
+                                </h3>
+                                <p class="text-muted mb-0">Professional Standard Operating Procedure</p>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button onclick="downloadSOPAsPDF('single')" class="btn btn-gradient-success">
+                                    <i class="material-icons align-middle">download</i>
+                                    PDF
                                 </button>
-                                <button onclick="copySOP('single')" class="btn btn-icon-only" title="Copy to clipboard">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
+                                <button onclick="copySOP('single')" class="btn btn-gradient-info">
+                                    <i class="material-icons align-middle">content_copy</i>
+                                    Copy
                                 </button>
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-4">
                             <div id="single-sop-content" class="sop-content"></div>
                         </div>
                     </div>
@@ -154,97 +526,128 @@
             </div>
 
             <!-- Batch Analysis Tab -->
-            <div id="batch-tab" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Batch Incident Analysis</h2>
-                        <p class="card-description">Add multiple incidents for ML-powered categorization and SOP generation</p>
+            <div class="tab-pane fade" id="batch" role="tabpanel">
+                <div class="card main-card">
+                    <div class="card-header card-header-custom p-4">
+                        <h3 class="mb-2">
+                            <i class="material-icons align-middle text-primary">inventory_2</i>
+                            Batch Incident Analysis
+                        </h3>
+                        <p class="text-muted mb-0">Add multiple incidents for ML-powered categorization and SOP generation</p>
                     </div>
-                    <div class="card-body">
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-label">Total Incidents</div>
-                                <div class="stat-value" id="total-incidents">0</div>
+                    <div class="card-body p-4">
+                        <!-- Stats -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="card border-primary shadow-sm">
+                                    <div class="card-body text-center">
+                                        <h3 class="fw-bold mb-0" id="total-incidents">0</h3>
+                                        <p class="text-muted mb-0">Total Incidents</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-label">Ready for Analysis</div>
-                                <div class="stat-value" id="ready-incidents">0</div>
+                            <div class="col-md-6">
+                                <div class="card border-success shadow-sm">
+                                    <div class="card-body text-center">
+                                        <h3 class="fw-bold mb-0" id="ready-incidents">0</h3>
+                                        <p class="text-muted mb-0">Ready for Analysis</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
                         <form id="batch-incident-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="batch_short_description">Short Description *</label>
-                                    <input type="text" id="batch_short_description" name="short_description" placeholder="Brief summary" class="form-input" required>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Short Description <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="batch_short_description" name="short_description" placeholder="Brief summary" required>
                                 </div>
-                                <div class="form-group">
-                                    <label for="batch_category">Category *</label>
-                                    <select id="batch_category" name="category" class="form-select" required>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="batch_category" name="category" required>
                                         <option value="">Select Category</option>
-                                        <option value="Email">Email</option>
-                                        <option value="Network">Network</option>
-                                        <option value="Hardware">Hardware</option>
-                                        <option value="Software">Software</option>
-                                        <option value="Database">Database</option>
-                                        <option value="Access">Access/Security</option>
-                                        <option value="Other">Other</option>
+                                        <!-- Categories loaded dynamically from MongoDB -->
                                     </select>
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="batch_description">Detailed Description *</label>
-                                <textarea id="batch_description" name="description" rows="3" placeholder="Detailed problem description..." class="form-textarea" required></textarea>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Detailed Description <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="batch_description" name="description" rows="3" placeholder="Detailed problem description..." required></textarea>
                             </div>
 
-                            <div class="form-group">
-                                <label for="batch_resolution_notes">Resolution Notes *</label>
-                                <textarea id="batch_resolution_notes" name="resolution_notes" rows="3" placeholder="Resolution details..." class="form-textarea" required></textarea>
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Resolution Notes <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="batch_resolution_notes" name="resolution_notes" rows="3" placeholder="Resolution details..." required></textarea>
                             </div>
 
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-secondary">
-                                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
+                            <div class="d-flex gap-2 pt-3 border-top justify-content-center flex-wrap">
+                                <button type="submit" class="btn btn-gradient-info btn-lg">
+                                    <i class="material-icons align-middle">add</i>
                                     Add Incident
                                 </button>
-                                <button type="button" onclick="generateBatchSOPs()" class="btn btn-primary" id="generate-batch-btn" disabled>
-                                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                    </svg>
-                                    Generate SOPs
+                                <button type="button" onclick="generateBatchSOPs()" class="btn btn-gradient-primary btn-lg" id="generate-batch-btn" disabled>
+                                    <i class="material-icons align-middle">bolt</i>
+                                    Generate All SOPs
                                 </button>
-                                <button type="button" onclick="clearAllIncidents()" class="btn btn-secondary">Clear All</button>
+                                <button type="button" onclick="clearAllIncidents()" class="btn btn-gradient-danger btn-lg">
+                                    <i class="material-icons align-middle">delete</i>
+                                    Clear All
+                                </button>
                             </div>
                         </form>
 
-                        <!-- Incidents List -->
-                        <div id="incidents-list" class="incidents-list"></div>
+                        <div id="incidents-list" class="mt-4"></div>
                     </div>
                 </div>
 
-                <!-- Batch SOP Results -->
-                <div id="batch-sop-results" class="sop-result" style="display: none;"></div>
+                <div id="batch-sop-results" style="display: none;"></div>
             </div>
         </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>© 2025 Incident Analyzer & SOP Generator | AI-Powered Documentation</p>
-        </footer>
     </div>
 
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay" style="display: none;">
-        <div class="loading-spinner"></div>
-        <p class="loading-text">Processing...</p>
+    <div class="modal" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0">
+                <div class="modal-body text-center">
+                    <div class="spinner-border text-light" style="width: 4rem; height: 4rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h4 class="text-white mt-3 fw-bold">Processing with AI...</h4>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast"></div>
+    <!-- Toast Notification Container -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="toastNotification" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto" id="toastTitle">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Message
+            </div>
+        </div>
+    </div>
 
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- MDB JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.1.0/mdb.umd.min.js"></script>
+    
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    
+    <script>
+        // Update stats on page load
+        fetch('/get_incidents').then(r => r.json()).then(data => {
+            if (data.success) {
+                document.getElementById('stat-incidents').textContent = data.total || 0;
+            }
+        });
+    </script>
 </body>
 </html>

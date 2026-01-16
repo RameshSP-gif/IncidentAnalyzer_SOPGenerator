@@ -1,0 +1,114 @@
+[
+  {
+    "number": "INC0001",
+    "short_description": "User unable to access email account",
+    "description": "User reports that they cannot log into their email account. Error message 'Invalid credentials' appears. User tried resetting password but still cannot access.",
+    "category": "Email",
+    "priority": "3",
+    "resolution_notes": "Verified user account was locked due to multiple failed login attempts. Unlocked the account in Active Directory. Reset password following company policy. Tested login - successful. Advised user to clear browser cache and cookies. Confirmed user can now access email normally. Issue resolved.",
+    "sys_created_on": "2025-11-15T09:00:00",
+    "resolved_at": "2025-11-15T09:30:00"
+  },
+  {
+    "number": "INC0002",
+    "short_description": "Cannot send emails with attachments",
+    "description": "User reports that emails with attachments larger than 5MB fail to send. Error message 'Message too large' appears. Smaller emails without attachments send successfully.",
+    "category": "Email",
+    "priority": "3",
+    "resolution_notes": "Checked mailbox settings and increased attachment size limit from 5MB to 25MB in Exchange admin center. Tested sending 10MB attachment - successful. User confirmed can now send large attachments. Also advised user about file compression options for very large files.",
+    "sys_created_on": "2025-11-14T10:00:00",
+    "resolved_at": "2025-11-14T10:15:00"
+  },
+  {
+    "number": "INC0003",
+    "short_description": "Email synchronization not working on mobile",
+    "description": "User's mobile device not syncing with corporate email. Last sync was 24 hours ago. Desktop email works fine. User using company iPhone with native Mail app.",
+    "category": "Email",
+    "priority": "2",
+    "resolution_notes": "Removed email account from mobile device. Re-added account using correct Exchange ActiveSync settings. Verified SSL enabled and port 443 configured. Performed manual sync - successful. All emails from past 24 hours downloaded. Tested automatic sync - working. User confirmed continuous sync functioning normally.",
+    "sys_created_on": "2025-11-13T14:00:00",
+    "resolved_at": "2025-11-13T14:45:00"
+  },
+  {
+    "number": "INC0004",
+    "short_description": "Intermittent network connectivity drops",
+    "description": "User experiencing frequent disconnections from corporate network. Connection drops every 15-20 minutes requiring manual reconnection. Affecting productivity and ongoing video conferences. Problem occurs on both wired and wireless connections.",
+    "category": "Network",
+    "priority": "2",
+    "resolution_notes": "Diagnosed network adapter driver issue. Updated network adapter driver to latest version from manufacturer website (v12.5.3.2). Disabled power management settings in device manager that were causing adapter to sleep. Configured 'Maximum Performance' power plan. Monitored connection for 2 hours - no disconnections observed. Tested with continuous video conference for 1 hour - stable connection maintained. User confirmed issue resolved.",
+    "sys_created_on": "2025-11-12T11:00:00",
+    "resolved_at": "2025-11-12T13:30:00"
+  },
+  {
+    "number": "INC0005",
+    "short_description": "Slow network file transfer speeds",
+    "description": "File transfers to network drive extremely slow. 100MB file takes 20+ minutes to copy. Other users report normal speeds. Problem only affecting this user's computer. Internet speed tests show normal results.",
+    "category": "Network",
+    "priority": "3",
+    "resolution_notes": "Discovered network cable had damaged connector causing significant packet loss (15% loss detected). Replaced ethernet cable with new Cat6 cable. Tested file transfer speeds - improved to normal range (100MB in 2 minutes). Ran extended network diagnostics using ping -t and pathping - no packet loss detected. Verified switch port functioning correctly. User confirmed problem completely resolved.",
+    "sys_created_on": "2025-11-11T15:00:00",
+    "resolved_at": "2025-11-11T15:45:00"
+  },
+  {
+    "number": "INC0006",
+    "short_description": "VPN connection timeout errors",
+    "description": "Remote user cannot establish VPN connection to corporate network. Connection times out after authentication. User working from home needs access to file servers. Problem started yesterday. User can connect to internet normally.",
+    "category": "Network",
+    "priority": "2",
+    "resolution_notes": "Checked VPN server logs - SSL certificate expired on 2025-11-09. Renewed SSL certificate on VPN gateway using Let's Encrypt. Restarted VPN service and verified certificate installation. Tested connection from multiple remote locations - successful connections established. Updated DNS records to reflect new certificate. User able to connect and access all network resources. Documented certificate renewal process for future reference.",
+    "sys_created_on": "2025-11-10T09:00:00",
+    "resolved_at": "2025-11-10T10:30:00"
+  },
+  {
+    "number": "INC0007",
+    "short_description": "Password reset request - account locked",
+    "description": "User forgot domain password and cannot log into workstation. Account showing as locked in Active Directory. User needs immediate access to complete urgent report deadline today.",
+    "category": "Access",
+    "priority": "1",
+    "resolution_notes": "Verified user identity using security questions and employee ID verification. Unlocked account in Active Directory Users and Computers. Generated temporary password following security policy (12 characters, mixed case, numbers, symbols). User successfully logged in using temporary password. Configured account to require password change at next login per company policy. Documented password reset in audit log and sent notification to user's manager. User confirmed access restored and able to complete urgent work.",
+    "sys_created_on": "2025-11-09T08:00:00",
+    "resolved_at": "2025-11-09T08:20:00"
+  },
+  {
+    "number": "INC0008",
+    "short_description": "Cannot access shared network folder",
+    "description": "User recently transferred to new department. Cannot access shared department folder that colleagues can access. User gets 'Access Denied' error message. Permissions issue suspected.",
+    "category": "Access",
+    "priority": "3",
+    "resolution_notes": "Reviewed user Active Directory group memberships in AD Users and Computers. Added user to appropriate security group 'DeptMarketing-FullAccess' for department shared folder. Removed user from old department group 'DeptSales-ReadOnly'. Ran 'gpupdate /force' to propagate changes immediately. Waited 15 minutes for changes to replicate across all domain controllers. User logged off and back on to refresh group membership tokens. User successfully accessed shared folder. Verified both read and write permissions working correctly by creating test file. Documented group membership change in change log.",
+    "sys_created_on": "2025-11-08T13:00:00",
+    "resolved_at": "2025-11-08T13:45:00"
+  },
+  {
+    "number": "INC0010",
+    "short_description": "Computer running very slow - high CPU usage",
+    "description": "User reports computer extremely slow. Takes 5+ minutes to open applications. Windows 10 system. Task Manager shows constant 95-100% CPU usage. Multiple applications freezing. Computer purchased 3 years ago.",
+    "category": "Hardware",
+    "priority": "2",
+    "resolution_notes": "Investigated high CPU usage. Identified Windows Update service (wuauserv) and Windows Search (SearchIndexer.exe) consuming 80% CPU. Rebooted computer to complete pending Windows updates. After restart, ran Disk Cleanup to remove temporary files (freed 15GB). Disabled Windows Search indexing for non-essential drives. Ran full antivirus scan (Defender) - no malware found. Checked startup programs and disabled unnecessary applications using Task Manager. Upgraded RAM from 8GB to 16GB (approved by manager). CPU usage now normal (15-25% idle). All applications responding quickly. User confirmed significant performance improvement.",
+    "sys_created_on": "2025-11-06T14:00:00",
+    "resolved_at": "2025-11-06T16:30:00"
+  },
+  {
+    "number": "INC0011",
+    "short_description": "ISOM Order Cancellation failed",
+    "description": "ISOM Order Cancellation failed",
+    "category": "Software",
+    "subcategory": "",
+    "priority": "3",
+    "resolution_notes": "ISOM Order Cancellation failed",
+    "sys_created_on": "2025-11-20T16:46:41.019980",
+    "resolved_at": "2025-11-20T16:46:41.019980"
+  },
+  {
+    "number": "INC0012",
+    "short_description": "User unable to access email account",
+    "description": "User reports that they cannot log into their email account. Error message 'Invalid credentials' appears. User tried resetting password but still cannot access.",
+    "category": "Email",
+    "subcategory": "",
+    "priority": "3",
+    "resolution_notes": "Verified user account was locked due to multiple failed login attempts. Unlocked the account in Active Directory. Reset password following company policy. Tested login - successful. Advised user to clear browser cache and cookies. Confirmed user can now access email normally. Issue resolved.",
+    "sys_created_on": "2026-01-06T20:32:10.075422",
+    "resolved_at": "2026-01-06T20:32:10.075422"
+  }
+]

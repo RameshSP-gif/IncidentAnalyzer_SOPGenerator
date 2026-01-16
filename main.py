@@ -22,6 +22,7 @@ from src.servicenow import create_client_from_env
 from src.data_validation import create_validator_from_config
 from src.categorization import create_categorizer_from_config
 from src.sop_generation import create_generator_from_config
+from src.database import get_db_client
 
 
 class SOPOrchestrator:
@@ -50,6 +51,7 @@ class SOPOrchestrator:
         self.validator = create_validator_from_config(self.config)
         self.categorizer = create_categorizer_from_config(self.config)
         self.sop_generator = create_generator_from_config(self.config)
+        self.db_client = get_db_client()
         
         # Setup directories
         self.data_dir = Path(os.getenv("DATA_DIR", "./data"))
@@ -130,6 +132,11 @@ class SOPOrchestrator:
             json.dump(incidents, f, indent=2, ensure_ascii=False)
         
         logger.info(f"Saved {len(incidents)} incidents to {output_file}")
+        
+        # Save to MongoDB
+        logger.info("Saving incidents to MongoDB...")
+        inserted_count = self.db_client.insert_many_incidents(incidents)
+        logger.info(f"Inserted {inserted_count} incidents into MongoDB")
         
         return incidents
     
@@ -282,6 +289,77 @@ class SOPOrchestrator:
         logger.info(f"Generated {len(sop_files)} SOPs")
         return sop_files
     
+    def analyze_from_mongodb(self, limit: int = 5000) -> Dict:
+        """
+        Analyze incidents directly from MongoDB and generate SOPs
+        
+        Args:
+            limit: Maximum number of incidents to analyze
+            
+        Returns:
+            Dictionary with analysis results
+        """
+        logger.info("=" * 60)
+        logger.info("Analyzing Incidents from MongoDB")
+        logger.info("=" * 60)
+        
+        start_time = datetime.now()
+        
+        try:
+            # Step 1: Load incidents from MongoDB
+            logger.info("=== STEP 1: Loading Incidents from MongoDB ===")
+            incidents = self.db_client.get_all_incidents(limit=limit)
+            
+            if not incidents:
+                logger.error("No incidents in MongoDB. Exiting.")
+                return {"status": "error", "message": "No incidents in MongoDB"}
+            
+            logger.info(f"Loaded {len(incidents)} incidents from MongoDB")
+            
+            # Step 2: Validate incidents
+            valid, invalid = self.validate_incidents(incidents)
+            
+            if not valid:
+                logger.error("No valid incidents. Exiting.")
+                return {"status": "error", "message": "No valid incidents"}
+            
+            # Step 3: Categorize incidents
+            clusters = self.categorize_incidents(valid)
+            
+            if not clusters:
+                logger.error("No clusters created. Exiting.")
+                return {"status": "error", "message": "No clusters created"}
+            
+            # Step 4: Generate SOPs
+            sop_files = self.generate_sops(clusters)
+            
+            end_time = datetime.now()
+            duration = (end_time - start_time).total_seconds()
+            
+            logger.info("=" * 60)
+            logger.info("Analysis Completed Successfully")
+            logger.info(f"Duration: {duration:.2f} seconds")
+            logger.info(f"Total Incidents: {len(incidents)}")
+            logger.info(f"Valid Incidents: {len(valid)}")
+            logger.info(f"Clusters: {len(clusters)}")
+            logger.info(f"SOPs Generated: {len(sop_files)}")
+            logger.info("=" * 60)
+            
+            return {
+                "status": "success",
+                "total_incidents": len(incidents),
+                "valid_incidents": len(valid),
+                "invalid_incidents": len(invalid),
+                "clusters": len(clusters),
+                "sops_generated": len(sop_files),
+                "duration_seconds": duration,
+                "sop_files": sop_files
+            }
+            
+        except Exception as e:
+            logger.error(f"Analysis failed: {e}", exc_info=True)
+            return {"status": "error", "message": str(e)}
+    
     def run_full_pipeline(
         self,
         days_back: int = 90,
@@ -405,7 +483,31 @@ def main():
         help="Path to configuration file"
     )
     
+    parser.add_argument(
+        "--from-mongodb",
+        action="store_true",
+        help="Analyze incidents from MongoDB (skip fetch)"
+    )
+    
     args = parser.parse_args()
+    
+    # Initialize orchestrator
+    orchestrator = SOPOrchestrator(config_path=args.config)
+    
+    # If analyzing from MongoDB
+    if args.from_mongodb:
+        result = orchestrator.analyze_from_mongodb(limit=args.limit or 5000)
+        
+        if result["status"] == "success":
+            print("\n✓ MongoDB analysis completed successfully!")
+            print(f"  Analyzed {result['total_incidents']} incidents from MongoDB")
+            print(f"  Generated {result['sops_generated']} SOPs from {result['valid_incidents']} valid incidents")
+            print(f"  Duration: {result['duration_seconds']:.2f} seconds")
+        else:
+            print(f"\n✗ Analysis failed: {result.get('message', 'Unknown error')}")
+            sys.exit(1)
+        
+        return
     
     # If no specific steps specified, run full pipeline
     if not any([args.fetch, args.validate, args.categorize, args.generate]):

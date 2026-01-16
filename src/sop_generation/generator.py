@@ -117,41 +117,175 @@ class SOPGenerator:
         }
     
     def _extract_resolution_steps(self, resolutions: List[Dict]) -> List[str]:
-        """Extract common resolution steps from resolutions"""
-        # Simple extraction - look for numbered lists, bullet points, etc.
+        """Extract common resolution steps from resolutions and convert to actionable instructions"""
         all_steps = []
         
+        # First try to find existing numbered/bulleted steps
         for res_data in resolutions:
             resolution = res_data["resolution"]
-            
-            # Split by common delimiters
             lines = resolution.split('\n')
             
             for line in lines:
                 line = line.strip()
-                
                 # Look for step indicators
-                if any(line.startswith(prefix) for prefix in ['1.', '2.', '3.', '-', '*', '•']):
-                    # Clean up the step
-                    step = line.lstrip('0123456789.-*•) \t')
-                    if len(step) > 10:  # Meaningful step
-                        all_steps.append(step)
+                if any(line.startswith(prefix) for prefix in ['1.', '2.', '3.', '4.', '5.', '6.', '7.', '8.', '9.', '0.', '-', '*', '•', '▪', '○']):
+                    step = line.lstrip('0123456789.-*•▪○) \t')
+                    if len(step) > 10:
+                        all_steps.append(self._convert_to_imperative(step))
         
-        # Get most common steps (simple frequency-based)
-        step_freq = {}
+        # If no structured steps found, convert resolution into action steps
+        if not all_steps:
+            for res_data in resolutions:
+                resolution = res_data["resolution"]
+                
+                # Split by common delimiters
+                sentences = []
+                for delimiter in ['. ', '.\n', '; ', ';\n']:
+                    if delimiter in resolution:
+                        sentences.extend([s.strip() for s in resolution.split(delimiter) if s.strip()])
+                        break
+                
+                if not sentences:
+                    sentences = [resolution]
+                
+                # Convert each sentence into a step
+                for sentence in sentences:
+                    sentence = sentence.strip().rstrip('.')
+                    if sentence and len(sentence) > 15:
+                        imperative_step = self._convert_to_imperative(sentence)
+                        if imperative_step:
+                            all_steps.append(imperative_step)
+        
+        # If still no steps, create detailed steps from the full resolution
+        if not all_steps and resolutions:
+            resolution_text = resolutions[0]["resolution"]
+            problem = resolutions[0].get('problem', 'the reported issue')
+            
+            if resolution_text and len(resolution_text) > 20:
+                # Create detailed actionable steps
+                all_steps = [
+                    f"Identify and verify the symptoms of {problem}",
+                    f"Follow these resolution steps: {self._convert_to_imperative(resolution_text)}",
+                    "Test the solution to confirm the issue is resolved",
+                    "Verify all affected systems/services are functioning normally",
+                    "Document the resolution and close the incident ticket"
+                ]
+        
+        # Get unique steps (deduplicate similar ones)
+        unique_steps = []
+        seen_patterns = set()
+        
         for step in all_steps:
-            # Normalize for comparison
-            normalized = step.lower()[:50]  # First 50 chars
-            step_freq[step] = step_freq.get(step, 0) + 1
+            # Use first 50 chars as pattern for deduplication
+            pattern = step.lower()[:50]
+            if pattern not in seen_patterns:
+                seen_patterns.add(pattern)
+                unique_steps.append(step)
         
-        # Return top steps
-        sorted_steps = sorted(
-            step_freq.items(),
-            key=lambda x: x[1],
-            reverse=True
-        )
+        return unique_steps[:20]  # Return up to 20 steps
+    
+    def _convert_to_imperative(self, text: str) -> str:
+        """Convert past-tense resolution text to imperative instructions"""
+        text = text.strip()
         
-        return [step for step, _ in sorted_steps[:10]]
+        # Mapping of past tense verbs to imperative commands
+        verb_conversions = {
+            # Past tense -> Imperative
+            'restarted': 'Restart',
+            'reset': 'Reset',
+            'checked': 'Check',
+            'verified': 'Verify',
+            'updated': 'Update',
+            'configured': 'Configure',
+            'installed': 'Install',
+            'removed': 'Remove',
+            'disabled': 'Disable',
+            'enabled': 'Enable',
+            'replaced': 'Replace',
+            'tested': 'Test',
+            'ran': 'Run',
+            'opened': 'Open',
+            'closed': 'Close',
+            'cleared': 'Clear',
+            'recreated': 'Recreate',
+            'increased': 'Increase',
+            'decreased': 'Decrease',
+            'set': 'Set',
+            'changed': 'Change',
+            'added': 'Add',
+            'deleted': 'Delete',
+            'modified': 'Modify',
+            'reviewed': 'Review',
+            'rebuilt': 'Rebuild',
+            'reconfigured': 'Reconfigure',
+            'repaired': 'Repair',
+            'fixed': 'Fix',
+            'resolved': 'Resolve',
+            'ensured': 'Ensure',
+            'rebooted': 'Reboot',
+            'downloaded': 'Download',
+            'uploaded': 'Upload',
+            'adjusted': 'Adjust',
+            'diagnosed': 'Diagnose',
+            'identified': 'Identify',
+            'confirmed': 'Confirm',
+            'advised': 'Advise',
+            'implemented': 'Implement',
+            'created': 'Create',
+            'sent': 'Send',
+            'unlocked': 'Unlock',
+            'logged': 'Log',
+            'connected': 'Connect',
+            'disconnected': 'Disconnect',
+            'found': 'Find',
+            'located': 'Locate',
+            'navigated': 'Navigate',
+            'selected': 'Select',
+            'clicked': 'Click',
+            'entered': 'Enter',
+            'typed': 'Type',
+            'executed': 'Execute',
+            'performed': 'Perform',
+            'applied': 'Apply',
+            'activated': 'Activate',
+            'deactivated': 'Deactivate'
+        }
+        
+        # Convert text
+        words = text.split()
+        if not words:
+            return text
+        
+        first_word_lower = words[0].lower().rstrip('.,;:')
+        
+        # Check if first word is a past tense verb we can convert
+        if first_word_lower in verb_conversions:
+            words[0] = verb_conversions[first_word_lower]
+            result = ' '.join(words)
+        else:
+            # Try to detect past tense patterns and convert
+            result = text
+            for past, imperative in verb_conversions.items():
+                # Replace at word boundaries
+                import re
+                pattern = r'\b' + past + r'\b'
+                # Only replace if it's at the beginning or after common phrases
+                if re.match(pattern, result.lower()):
+                    result = re.sub(pattern, imperative, result, count=1, flags=re.IGNORECASE)
+                    break
+        
+        # Ensure proper capitalization
+        if result:
+            result = result[0].upper() + result[1:]
+        
+        # Remove trailing period and ensure instruction format
+        result = result.rstrip('.')
+        
+        # Add period at the end
+        if result and not result.endswith(('.', '!', '?')):
+            result += '.'
+        
+        return result
     
     def _generate_markdown_sop(self, cluster_id: int, data: Dict) -> str:
         """Generate SOP in Markdown format"""
