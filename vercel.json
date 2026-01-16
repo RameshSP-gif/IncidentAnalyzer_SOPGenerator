@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "api/index.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
     }
   ],
   "routes": [
@@ -15,9 +18,5 @@
       "src": "/(.*)",
       "dest": "api/index.py"
     }
-  ],
-  "env": {
-    "MONGODB_URI": "@mongodb_uri",
-    "FLASK_ENV": "production"
-  }
+  ]
 }
