@@ -462,27 +462,28 @@ class MongoDBClient:
             if not number:
                 number = f"INC{datetime.now().strftime('%Y%m%d%H%M%S')}"
             
-            # Build incident object with defaults matching new CSV structure
+            # Build incident object with all fields from CSV mapped correctly
             incident = {
                 'number': number,
                 'short_description': short_desc or description[:100] if description else 'Imported incident',
                 'description': description or short_desc or 'No description provided',
-                'contact_type': get_value('contact_type', 'Contact type', 'Contact Type') or '',
-                'service_offering': get_value('service_offering', 'Service offering', 'Service Offering') or '',
+                'contact_type': get_value('contact_type', 'Contact type', 'Contact Type', 'contacttype') or '',
+                'service_offering': get_value('service_offering', 'Service offering', 'Service Offering', 'serviceoffering') or '',
                 'category': get_value('category', 'Category') or 'General',
-                'subcategory': get_value('subcategory', 'Subcategory', 'sub_category') or '',
-                'priority': get_value('priority', 'Priority') or '3',
-                'state': get_value('state', 'State', 'status', 'Status', 'incident_state', 'Incident state') or 'Closed',
+                'subcategory': get_value('subcategory', 'Subcategory', 'sub_category', 'Sub Category') or '',
+                'priority': get_value('priority', 'Priority', 'pri') or '3',
+                'state': get_value('state', 'State', 'status', 'Status', 'incident_state', 'Incident state', 'incident state') or 'Closed',
                 'resolution_notes': get_value('resolution_notes', 'Resolution notes', 'Resolution Notes', 
-                                             'resolution', 'Resolution', 'fix', 'Fix', 'solution', 'Solution') or '',
-                'close_notes': get_value('close_notes', 'Close Notes', 'closing_notes') or '',
-                'closed_by': get_value('closed_by', 'Closed by', 'Closed By') or '',
-                'work_notes': get_value('work_notes', 'Work Notes', 'notes', 'Notes') or '',
-                'assignment_group': get_value('assignment_group', 'Assignment group', 'Assignment Group', 'group') or '',
-                'assigned_to': get_value('assigned_to', 'Assigned to', 'Assigned To', 'assignee', 'Assignee') or '',
-                'sys_created_on': get_value('sys_created_on', 'Created', 'created_on', 'created') or datetime.now().isoformat(),
-                'sys_updated_on': get_value('sys_updated_on', 'Updated', 'updated_on', 'modified') or datetime.now().isoformat(),
-                'resolved_at': get_value('resolved_at', 'Resolved', 'Resolved At', 'resolved', 'resolution_date') or '',
+                                             'resolution', 'Resolution', 'fix', 'Fix', 'solution', 'Solution',
+                                             'resolutionnotes') or '',
+                'close_notes': get_value('close_notes', 'Close Notes', 'Close notes', 'closing_notes', 'closenotes') or '',
+                'closed_by': get_value('closed_by', 'Closed by', 'Closed By', 'closedby') or '',
+                'work_notes': get_value('work_notes', 'Work Notes', 'Work notes', 'notes', 'Notes', 'worknotes') or '',
+                'assignment_group': get_value('assignment_group', 'Assignment group', 'Assignment Group', 'group', 'assignmentgroup') or '',
+                'assigned_to': get_value('assigned_to', 'Assigned to', 'Assigned To', 'assignee', 'Assignee', 'assignedto') or '',
+                'sys_created_on': get_value('sys_created_on', 'Created', 'created_on', 'created', 'Created On') or datetime.now().isoformat(),
+                'sys_updated_on': get_value('sys_updated_on', 'Updated', 'updated_on', 'modified', 'Updated On') or datetime.now().isoformat(),
+                'resolved_at': get_value('resolved_at', 'Resolved', 'Resolved At', 'resolved', 'resolution_date', 'Resolved at') or '',
             }
             
             # Final validation - must have at least a description

@@ -23,7 +23,7 @@ db_client = get_db_client()
 
 # Initialize components (without ML categorizer for faster startup)
 validator = DataValidator(
-    required_fields=["number", "short_description"],  # Resolution now optional with RAG
+    required_fields=["short_description"],  # Only short_description required, others optional
     min_description_length=20,
     min_resolution_length=30
 )
@@ -190,8 +190,8 @@ def add_incident():
         # Refresh cache after adding new incident
         refresh_incidents_cache()
         
-        # Also add to knowledge base if resolution is provided
-        if incident.get('resolution_notes'):
+        # Add resolution to RAG if available and has meaningful content
+        if incident.get('resolution_notes') and len(incident.get('resolution_notes', '').strip()) > 20:
             try:
                 finder = get_resolution_finder()
                 finder.add_to_knowledge_base(incident)
@@ -578,9 +578,10 @@ def analyze_single():
         
         print(f"[DEBUG] Generating SOP...")
         
-        # If no resolution provided, add a placeholder
-        if not incident.get('resolution_notes') or len(incident.get('resolution_notes', '')) < 10:
-            incident['resolution_notes'] = "Resolution pending. Use 'AI Suggest Resolution' feature or enter resolution manually for complete SOP."
+        # DON'T replace resolution_notes - use actual data from MongoDB/CSV
+        # Only add placeholder if truly empty
+        if not incident.get('resolution_notes'):
+            incident['resolution_notes'] = "No resolution notes available. Please update the incident with resolution details."
         
         sop_content = generator.generate_sop(0, [incident], analysis)
         print(f"[DEBUG] SOP generated, length: {len(sop_content) if sop_content else 0}")

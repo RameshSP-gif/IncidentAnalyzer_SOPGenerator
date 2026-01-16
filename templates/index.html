@@ -428,11 +428,11 @@
                                     </div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                                    <label class="form-label fw-semibold">Category <span class="text-muted">(optional)</span></label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-light"><i class="material-icons">category</i></span>
-                                        <select class="form-select" id="category" name="category" required>
-                                            <option value="">Select Category</option>
+                                        <select class="form-select" id="category" name="category">
+                                            <option value="">Select Category (defaults to General)</option>
                                             <!-- Categories loaded dynamically from MongoDB -->
                                         </select>
                                     </div>
@@ -563,9 +563,9 @@
                                     <input type="text" class="form-control" id="batch_short_description" name="short_description" placeholder="Brief summary" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="batch_category" name="category" required>
-                                        <option value="">Select Category</option>
+                                    <label class="form-label fw-semibold">Category <span class="text-muted">(optional)</span></label>
+                                    <select class="form-select" id="batch_category" name="category">
+                                        <option value="">Select Category (defaults to General)</option>
                                         <!-- Categories loaded dynamically from MongoDB -->
                                     </select>
                                 </div>
